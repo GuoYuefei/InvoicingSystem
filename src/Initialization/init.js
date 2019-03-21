@@ -161,13 +161,12 @@ export class Win extends Component {
             
             //Baseinfo
             baseinfo: {
-                taxpayerName: {name:"taxperName",value:"1", handerChange: this.handerChange1},
-                taxpayerID: {name:"taxpayerID", value:"2", handerChange: this.handerChange0},
-                category: {name:"category", values:[{name:"", value:""}], handerChange: this.handerChange0},
-                billintype: {name:"billintype", values:[{name:"", value:""}], handerChange: this.handerChange0} 
+                taxpayerName: {name:"taxperName",value:"1", handerChange: this.handerChange("taxperName")},
+                taxpayerID: {name:"taxpayerID", value:"2", handerChange: this.handerChange("taxpayerID")},
+                category: {name:"category", values:[{name:"1", value:"1"},{name:"2", value:"2"}], handerChange: this.handerChange("category")},
+                billintype: {name:"billintype", values:[{name:"2", value:"2"}], handerChange: this.handerChange("billintype")} 
             },
-
-
+            
             /******************* */
             main: <TimeInit />, 
             buttons: <Buttons bsets={this.bsets} />
@@ -178,23 +177,27 @@ export class Win extends Component {
         // console.log(e.target)
     }
 
-    // todo 使用动态属性名来创建函数实现不同的功能
-    handerChange1 = (e) => {
-        const target = e.target;
-        console.log(target);
-        // console.log(this.state)
-        // 注意这个函数不是深拷贝
-        const taxpayerName = Object.assign({}, this.state.baseinfo.taxpayerName, {value: target.value})
+    // 动态构造所需函数，减少代码量
+    handerChange = (attr) => {
+        // 返回一个handerChange的函数
+        return (e) => {
+            const target = e.target;
+            console.log(target);
+            // console.log(this.state)
+            // 注意这个函数不是深拷贝
+            const att = Object.assign({}, this.state.baseinfo[attr], {value: target.value})
 
-        const baseinfo = Object.assign(
-            {}, this.state.baseinfo, {taxpayerName: taxpayerName}
-        )
-        // console.log(baseinfo)
-        const state = Object.assign({}, this.state, {baseinfo: baseinfo})
-        this.setState(state)
-        // this.setState((prevState, props) => ({
-        //     baseinfo: {taxpayerName:{value:target.value}}
-        // }))
+            const baseinfo = Object.assign(
+                {}, this.state.baseinfo, {[attr]: att}
+            )
+            // console.log(baseinfo)
+            const state = Object.assign({}, this.state, {baseinfo: baseinfo})
+            this.setState(state)
+            // this.setState((prevState, props) => ({
+            //     baseinfo: {taxpayerName:{value:target.value}}
+            // }))
+        }
+        
     }
 
     handerClick1 = () => {
