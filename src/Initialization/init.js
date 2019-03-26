@@ -1,16 +1,22 @@
+// @flow
 // 主要写初始化部分的组件
 import React, { Component } from 'react';
 
-export class TimeInit extends Component {
 
-    constructor(props) {
+export class TimeInit extends Component<any> {
+    
+    // FLOW 应该标记类型为NodeJS.Timeout, 可能是flow的问题 
+    timeid: any;         
+    state: any;   
+    setState: any;      // 参数不做类型检查
+    constructor(props: any) {
         super(props);
         this.state = {date: new Date()};
     }
 
     tick() {
         this.setState({
-            date: new Date()
+            date: new Date()                
         });
     }
     
@@ -19,7 +25,7 @@ export class TimeInit extends Component {
             this.tick()
         }, 1000);
     }
-
+    
     componentWillUnmount() {
         clearInterval(this.timeid)
     }
@@ -35,12 +41,16 @@ export class TimeInit extends Component {
 }
 
 // 正常输入框 使用状态提升
-// props {title:xxx, value:xxx, handerChange: function(e) }
-function MyInput(props) {
+// props {title:xxx, [name: xxx], [tip:xxx], value:xxx, handerChange: function(e) }
+function MyInput(props: {title: string, name: any, tip: any, value: string, handerChange: Function}) {
     return (
         <div>
             <label>{props.title+":"}</label>
             <input name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
+            {
+                    // TODO新加的提示文本，在外层实现后将TODO改成todo
+                    props.tip && <span style={{color:"red"}}>{props.tip} 23333333</span>
+            }
         </div>
     )
 }
@@ -70,37 +80,23 @@ function MySelect(props) {
  * }
  * 检查输入的业务逻辑应该由这个组件完成
  */
-export class BaseInfo extends Component {
-
-    constructor(props) {
+export class BaseInfo extends Component<any> {
+    // FLOW
+    titles: string[];
+    constructor(props: any) {
         super(props);
         this.titles = ["纳税人名称", "纳税人识别码", "行业分类", "开票种类"]
 
     }
-
-    /**
-     * 用于检测name字段的输入，组合父组件传入的函数
-     * @param fun funtion which is provided by father assembly
-     * @returns function(e)
-     */
-    // handerChange = (fun) => {
-    //     // FIXME 检查字段功能
-    //     return (e) => {
-    //         // const target = e.target
-    //         // TODO 学正则中。。。 
-    //     }
-    // }
-
-
 
     render() {
         const info = this.props.info;
         // 这里还是通过传入监听函数来缩小监听范围, 但是handerChange函数是由父组件提供的，所以，我们可以在这里生成写一个函数来组合父组件穿过来的函数
         return(
             <div>
-                <MyInput name={info.taxpayerName.name}  title={info.taxpayerName.title||this.titles[0]}
+                <MyInput name={info.taxpayerName.name} tip={info.taxpayerName.tip}  title={info.taxpayerName.title||this.titles[0]}
                     value={info.taxpayerName.value} handerChange={info.taxpayerName.handerChange} />
-                <MyInput name={info.taxpayerID.name} title={info.taxpayerID.title||this.titles[1]}
+                <MyInput name={info.taxpayerID.name} tip={info.taxpayerID.tip} title={info.taxpayerID.title||this.titles[1]}
                     value={info.taxpayerID.value} handerChange={info.taxpayerID.handerChange} />
                 <MySelect name={info.category.name} title={info.category.title||this.titles[2]} 
                     values={info.category.values} handerChange={info.category.handerChange} />
@@ -116,14 +112,15 @@ export class BaseInfo extends Component {
 
 
 
-function Button(props) {
+function Button(props: {value: string, handerClick: Function, disabled: boolean}) {
     return (
-        <button onClick = {props.handerClick}>{props.value}</button>
+        <button onClick = {props.handerClick} disabled = {props.disabled}>{props.value}</button>
     )
 }
 
-// 多个按钮 传入数据bset需要的[{value: xxx, handerClick: xxxx},...]
-export class Buttons extends Component {
+// FLOW
+// 多个按钮 传入数据bset需要的[{value: xxx, handerClick: xxxx},...] 
+export class Buttons extends Component<{bsets: Array<{value: string, handerClick: Function, disabled: boolean}>}> {
 
     // constructor(props) {
     //     super(props);
@@ -134,7 +131,7 @@ export class Buttons extends Component {
         return(
             <div>
                 {this.props.bsets.map((bset, index) => 
-                    <Button key={index} value={bset.value} handerClick={bset.handerClick}/>
+                    <Button key={index} value={bset.value} handerClick={bset.handerClick} disabled={bset.disabled}/>
                 )}
             </div>
         )
@@ -166,21 +163,29 @@ export class Buttons extends Component {
 //     }
 // }
 
-export class Win extends Component {
+export class Win extends Component<any> {
 
-    constructor(props) {
+    // bsets: Array<{value: string, handerClick: Function, disabled: boolean}>;
+    state: any;
+
+    constructor(props:any) {
         super(props);
-        this.bsets = [
-            {value: "Next", handerClick: this.handerClickNext},
-            {value: "Cancel", handerClick: this.handerClick2}
-        ]
+        // this.bsets = [
+        //     {value: "Next", handerClick: this.handerClickNext, disabled: false},
+        //     {value: "Cancel", handerClick: this.handerClick1, disabled: false}
+        // ]
         
         this.state = {
+
+            bsets: [
+                {value: "Next", handerClick: this.handerClickNext, disabled: false},
+                {value: "Cancel", handerClick: this.handerClick1, disabled: false} 
+            ],
             
             //Baseinfo
             baseinfo: {
-                taxpayerName: {name:"taxpayerName",value:"1", handerChange: this.handerChange("taxpayerName")},
-                taxpayerID: {name:"taxpayerID", value:"2", handerChange: this.handerChange("taxpayerID")},
+                taxpayerName: {name:"taxpayerName", value:"", tip:"" , handerChange: this.handerChange("taxpayerName")},
+                taxpayerID: {name:"taxpayerID", value:"", tip:"", handerChange: this.handerChange("taxpayerID")},
                 category: {name:"category", values:[{name:"1", value:"1"},{name:"2", value:"2"}], handerChange: this.handerChange("category")},
                 billintype: {name:"billintype", values:[{name:"2", value:"2"}], handerChange: this.handerChange("billintype")} 
             },
@@ -189,32 +194,67 @@ export class Win extends Component {
 
             // main: this.mains[0], 
             mainCounter: 0,
-            buttons: <Buttons bsets={this.bsets} />
+            // buttons: <Buttons bsets={this.state.bsets} />
         }
     }
 
-    // 动态构造所需函数，减少代码量
-    handerChange = (attr) => {
+    // 动态构造所需函数，减少代码量 
+    handerChange = (attr: string) => {
+        // todo 这里应该对输入的内容做限制 限制函数可以写在这个函数里面
+        // TODO 新加todo，可能将来需要返回这个函数，这时候应该在外面再写一个函数，并返回这个函数
+        let limit: Function = (str: string) => {
+            let patt: RegExp;
+            let message: string;
+            switch (attr) {
+                case this.state.baseinfo.taxpayerName.name:
+                    // 纳税人名称 ^[\u4e00-\u9fa5]{2,12}$ 中文吧，应该不会超过12个字了吧
+                    patt = /^[\u4e00-\u9fa5]{2,12}$/;
+                    message = patt.test(str) ? "" : "纳税人姓名应为2-12个中文字符"
+                    break;
+                case this.state.baseinfo.taxpayerID.name:
+                    // 纳税人识别码 数字15、18、20位
+                    patt = /^[0-9]{15}$|^[0-9]{18}$|^[0-9]{20}$/;
+                    message = patt.test(str) ? "" : "纳税人识别码应为15、18或者20位数字";
+                    break;
+                default: return "error";
+            }
+            return message;
+        }
+
+
+
+
+        // FLOW
         // 返回一个handerChange的函数
-        return (e) => {
-            const target = e.target;
+        return (e: Event) => {
+            const target: any = e.target;
             // console.log(target,target.value);
-            // console.log(this.state)
+            const value: string = target.value;
+            let alter = {value: value, tip: limit(value)}
+
+            // this.bsets[0].disabled = !alter.tip  
+            let bsets = this.state.bsets;
+            // FIXME 有问题，当一个输入框满足条件后就将按钮置可用 
+            // 解决方案，先将tip更新入state，然后查询baseinfo的两个属性的tip，设定bsets，然后再更新一次。  react本身用的就是虚拟DOM，所以效率差不了多少
+            bsets[0].disabled = !!alter.tip;
+            
+            console.log(alter)
+
+
             // 注意这个函数不是深拷贝
-            const att = Object.assign({}, this.state.baseinfo[attr], {value: target.value})     //对select记录值，对input更新并记录值
+            const att = Object.assign({}, this.state.baseinfo[attr], alter)     //对select记录值，对input更新并记录值
 
             const baseinfo = Object.assign(
                 {}, this.state.baseinfo, {[attr]: att}
             )
             console.log(baseinfo)
-            const state = Object.assign({}, this.state, {baseinfo: baseinfo})
+            const state = Object.assign({}, this.state, {baseinfo: baseinfo, bsets})
             console.log(state)
             this.setState(state)
             // this.setState((prevState, props) => ({
             //     baseinfo: {taxpayerName:{value:target.value}}
             // }))
-        }
-        
+        } 
     }
 
     handerClick1 = () => {
@@ -230,7 +270,9 @@ export class Win extends Component {
 
         //切换页面
         let mainCounter = this.state.mainCounter
-        const state = Object.assign({}, this.state, {mainCounter:mainCounter+1})
+        let bsets = this.state.bsets;
+        bsets[0].disabled = true;
+        const state = Object.assign({}, this.state, {mainCounter:mainCounter+1, bsets: bsets})
         this.setState(state)
     }
 
@@ -247,7 +289,8 @@ export class Win extends Component {
             <div>
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
-                {this.state.buttons}
+                {/* {this.state.buttons} */}
+                <Buttons bsets={this.state.bsets}/>
             </div>
         )
     }
