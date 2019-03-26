@@ -234,23 +234,37 @@ export class Win extends Component<any> {
 
             // this.bsets[0].disabled = !alter.tip  
             let bsets = this.state.bsets;
-            // FIXME 有问题，当一个输入框满足条件后就将按钮置可用 
-            // 解决方案，先将tip更新入state，然后查询baseinfo的两个属性的tip，设定bsets，然后再更新一次。  react本身用的就是虚拟DOM，所以效率差不了多少
-            bsets[0].disabled = !!alter.tip;
             
             console.log(alter)
-
-
+            
+            
             // 注意这个函数不是深拷贝
             const att = Object.assign({}, this.state.baseinfo[attr], alter)     //对select记录值，对input更新并记录值
-
+            
             const baseinfo = Object.assign(
                 {}, this.state.baseinfo, {[attr]: att}
             )
+
             console.log(baseinfo)
-            const state = Object.assign({}, this.state, {baseinfo: baseinfo, bsets})
+                
+            // fixme 有问题，当一个输入框满足条件后就将按钮置可用 
+            // 解决方案，先将tip更新入state，然后查询baseinfo的两个属性的tip，设定bsets，然后再更新一次。  react本身用的就是虚拟DOM，所以效率差不了多少
+            // ps: 在写解决方案的时候发现优化方法 在setState之前就已经在本地拿到state.baseinfo了，直接做判定
+            bsets[0].disabled = baseinfo.taxpayerName.tip || baseinfo.taxpayerID.tip ? true : false;
+
+
+            let state = Object.assign({}, this.state, {baseinfo})
             console.log(state)
+
+
+
             this.setState(state)
+
+            // to fix bug in bug branch 
+             
+
+
+
             // this.setState((prevState, props) => ({
             //     baseinfo: {taxpayerName:{value:target.value}}
             // }))
