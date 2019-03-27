@@ -1,8 +1,9 @@
 // @flow
 // 主要写初始化部分的组件
 import React, { Component } from 'react';
+import {Table} from 'react-bootstrap'
 
-
+// 第一个页面
 export class TimeInit extends Component<any> {
     
     // FLOW 应该标记类型为NodeJS.Timeout, 可能是flow的问题 
@@ -39,6 +40,7 @@ export class TimeInit extends Component<any> {
         )
     }
 }
+// 第一个页面end
 
 // 正常输入框 使用状态提升
 // props {title:xxx, [name: xxx], [tip:xxx], value:xxx, handerChange: function(e) }
@@ -48,7 +50,7 @@ function MyInput(props: {title: string, name: any, tip: any, value: string, hand
             <label>{props.title+":"}</label>
             <input name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
             {
-                    // TODO新加的提示文本，在外层实现后将TODO改成todo
+                    // todo新加的提示文本，在外层实现后将TODO改成todo
                     props.tip && <span style={{color:"red"}}>{props.tip} 23333333</span>
             }
         </div>
@@ -107,6 +109,81 @@ export class BaseInfo extends Component<any> {
     }
 }
 
+// FLOW 因为props类型难以确定所以用any代替
+type Props = any;
+
+// TODO 第三个页面
+// ps 第三个页面切分组件有些多表，表单外层，内层还可以在分解
+export class Adddrawer extends Component<Props> {
+    jsonData: string
+    constructor(props: Props) {
+        super(props)
+        // TODO 这个是造的数据
+        this.jsonData = '{"arr": [{"loginname":"gyf", "character": "管理员", "name": "郭月飞"}, {"loginname":"tam", "character": "管理员", "name": "天安门"}]}';
+    }
+
+    render() {
+        return(
+            <ADTable json={this.jsonData}/>
+        )
+    }
+}
+
+// table主体
+class ADTable extends Component<Props> {
+
+    renderTbody: Function
+
+    constructor(props: {arr:{loginname:string, character: string, name: string}[]}) {
+        super(props)
+        this.renderTbody = this.renderTbody.bind(this)
+    }
+
+    // 生成tbody
+    // json {arr: [{loginname:xxx, character: xxx, name: xxx}]}
+    renderTbody(json: string) {
+        console.log(json)
+        let obs = JSON.parse(json).arr;
+        console.log(obs)
+        const trs = obs.map((ob, index) => 
+            <tr>
+                <td>{index}</td>
+                <td>{ob.loginname}</td>
+                <td>{ob.character}</td>
+                <td>{ob.name}</td>
+            </tr>
+        )
+        return (
+            <tbody>
+                {trs}
+            </tbody>
+        )
+    }
+
+    // TODO table显示数据应该来自json，这里先在本地造json，以后添加异步请求json数据
+    render() {
+        return (
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                    <th>#</th>
+                    <th>开票人登录名</th>
+                    <th>角色</th>
+                    <th>姓名</th>
+                    </tr>
+                </thead>
+                {this.renderTbody(this.props.json)}
+            </Table>
+        )
+    }
+}
+
+// TODO 增加开票人的模态框
+
+
+
+
+
 
 
 
@@ -125,7 +202,6 @@ export class Buttons extends Component<{bsets: Array<{value: string, handerClick
     // constructor(props) {
     //     super(props);
     // }
-
 
     render() {
         return(
@@ -235,8 +311,7 @@ export class Win extends Component<any> {
             // this.bsets[0].disabled = !alter.tip  
             let bsets = this.state.bsets;
             
-            console.log(alter)
-            
+            // console.log(alter)
             
             // 注意这个函数不是深拷贝
             const att = Object.assign({}, this.state.baseinfo[attr], alter)     //对select记录值，对input更新并记录值
@@ -245,26 +320,18 @@ export class Win extends Component<any> {
                 {}, this.state.baseinfo, {[attr]: att}
             )
 
-            console.log(baseinfo)
-                
+            // console.log(baseinfo)
+            
             // fixme 有问题，当一个输入框满足条件后就将按钮置可用 
             // 解决方案，先将tip更新入state，然后查询baseinfo的两个属性的tip，设定bsets，然后再更新一次。  react本身用的就是虚拟DOM，所以效率差不了多少
             // ps: 在写解决方案的时候发现优化方法 在setState之前就已经在本地拿到state.baseinfo了，直接做判定
+            // THINK 为什么我没将bset重新setState也能成 ？：？：？：那是因为我拿到的是引用不是内存复制，其实就是对state中bsets数组 ： solomon
             bsets[0].disabled = baseinfo.taxpayerName.tip || baseinfo.taxpayerID.tip ? true : false;
-
-
+            
             let state = Object.assign({}, this.state, {baseinfo})
             console.log(state)
 
-
-
             this.setState(state)
-
-            // to fix bug in bug branch 
-             
-
-
-
             // this.setState((prevState, props) => ({
             //     baseinfo: {taxpayerName:{value:target.value}}
             // }))
@@ -296,7 +363,7 @@ export class Win extends Component<any> {
             <BaseInfo info={this.state.baseinfo} />
         ]
 
-        // TODO 将来完成后需要改，最后需要一个跳转路由
+        // TODO 将来完成后需要改，路由逻辑上要优化
         const main = mains[this.state.mainCounter>=mains.length?mains.length-1:this.state.mainCounter]
         // const main = this.mains[this.state.mainCounter]
         return (
@@ -304,6 +371,7 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
+                <Adddrawer />
                 <Buttons bsets={this.state.bsets}/>
             </div>
         )

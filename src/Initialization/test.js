@@ -1,7 +1,7 @@
 
 // 应用 状态提升
 import React, {Component} from 'react'
-
+import {Table} from 'react-bootstrap'
 
 /**
  * 状态提升，将控制变量交由父组件掌管。高级部分还可以通过使用ref
@@ -62,6 +62,43 @@ class MySelect extends Component {
     }
 }
 
+class MyTable extends Component {
+    
+    render() {
+        return(
+            <Table striped bordered hover variant="dark">
+                <thead>
+                    <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                    </tr>
+                    <tr>
+                    <td>2</td>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                    </tr>
+                    <tr>
+                    <td>3</td>
+                    <td colSpan="2">Larry the Bird</td>
+                    <td>@twitter</td>
+                    </tr>
+                </tbody>
+            </Table>
+        )
+    }
+}
+
 export class Test extends Component {
     
     constructor(props) {
@@ -86,6 +123,7 @@ export class Test extends Component {
             <div>
                 <MInput name={this.iputname} value={this.state.record} handerChange={this.handerChange}/>
                 <h5>{this.state.record}</h5>
+                <MyTable /> 
                 <MySelect label="测试"/>
             </div>
         )
