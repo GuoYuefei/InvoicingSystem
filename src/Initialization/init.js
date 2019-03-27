@@ -1,7 +1,7 @@
 // @flow
 // 主要写初始化部分的组件
 import React, { Component } from 'react';
-import {Table} from 'react-bootstrap'
+import {Table, Modal, Button, ButtonToolbar} from 'react-bootstrap'
 
 // 第一个页面
 export class TimeInit extends Component<any> {
@@ -42,16 +42,20 @@ export class TimeInit extends Component<any> {
 }
 // 第一个页面end
 
+type TYPEInputProps = {type?: string, title: string, name?: string, tip?: string, value: string, handerChange: Function}
+
 // 正常输入框 使用状态提升
 // props {title:xxx, [name: xxx], [tip:xxx], value:xxx, handerChange: function(e) }
-function MyInput(props: {title: string, name: any, tip: any, value: string, handerChange: Function}) {
+// 3.27 改造 新增type可选属性
+// FLOW 对象可选属性用?: 。函数可选参数用:?, 变态的flow 
+function MyInput(props: TYPEInputProps) {
     return (
         <div>
             <label>{props.title+":"}</label>
-            <input name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
+            <input type={props.type || 'text'} name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
             {
                     // todo新加的提示文本，在外层实现后将TODO改成todo
-                    props.tip && <span style={{color:"red"}}>{props.tip} 23333333</span>
+                    props.tip && <span style={{color:"red"}}>{props.tip} </span>
             }
         </div>
     )
@@ -83,7 +87,7 @@ function MySelect(props) {
  * 检查输入的业务逻辑应该由这个组件完成
  */
 export class BaseInfo extends Component<any> {
-    // FLOW
+
     titles: string[];
     constructor(props: any) {
         super(props);
@@ -96,8 +100,8 @@ export class BaseInfo extends Component<any> {
         // 这里还是通过传入监听函数来缩小监听范围, 但是handerChange函数是由父组件提供的，所以，我们可以在这里生成写一个函数来组合父组件穿过来的函数
         return(
             <div>
-                <MyInput name={info.taxpayerName.name} tip={info.taxpayerName.tip}  title={info.taxpayerName.title||this.titles[0]}
-                    value={info.taxpayerName.value} handerChange={info.taxpayerName.handerChange} />
+                {/* THINK {新get的写法，传入参数同名的情况下可以简写，es6} */}
+                <MyInput {...info.taxpayerName} title={info.taxpayerName.title||this.titles[0]} />
                 <MyInput name={info.taxpayerID.name} tip={info.taxpayerID.tip} title={info.taxpayerID.title||this.titles[1]}
                     value={info.taxpayerID.value} handerChange={info.taxpayerID.handerChange} />
                 <MySelect name={info.category.name} title={info.category.title||this.titles[2]} 
@@ -124,7 +128,10 @@ export class Adddrawer extends Component<Props> {
 
     render() {
         return(
-            <ADTable json={this.jsonData}/>
+            <div>
+                <ADTable json={this.jsonData}/>
+                <ADModal />
+            </div>
         )
     }
 }
@@ -146,7 +153,7 @@ class ADTable extends Component<Props> {
         let obs = JSON.parse(json).arr;
         console.log(obs)
         const trs = obs.map((ob, index) => 
-            <tr>
+            <tr key={index}>
                 <td>{index}</td>
                 <td>{ob.loginname}</td>
                 <td>{ob.character}</td>
@@ -179,23 +186,96 @@ class ADTable extends Component<Props> {
 }
 
 // TODO 增加开票人的模态框
+// 这里只提供一个模态框，但是Body内容有参数生成
+class ADModal extends Component<Props> {
+
+    state: any
+    setState: any
+    // TODO 模态框暂时只接受一个组件类型填充body内容，以后要有自定义各种配置
+    constructor(props: {mbody: Component<any>}) {
+        super(props)
+        this.state = {
+            modalShow: false
+        }
+    }
+
+    render() {
+        let modalClose = () => this.setState({ modalShow: false } );
+        return (
+            <div>
+                <Modal
+                    show = {this.state.modalShow}
+                    onHide = {modalClose}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        增加开票人
+                    </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h4>Centered Modal</h4>
+                        {this.props.mbody}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.props.onHide}>Close</Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <ButtonToolbar>
+                    <Button
+                        variant="primary"
+                        onClick={() => this.setState({ modalShow: true })}
+                        >
+                        Launch vertically centered modal
+                    </Button>
+
+                    {/* <MyVerticallyCenteredModal
+                    show={this.state.modalShow}
+                    onHide={modalClose}
+                    /> */}
+                </ButtonToolbar>
+            </div>
+        );
+      }
+}
+
+// TODO 增加开票人or修改开票人表单
+class AdddraForm extends Component<Props> {
+
+    constructor(props) {
+        super(props)
+        // TODO 先将东西放在这个组件中，以后搬运到父组件，因为父组件需要控制这个组件的输入
+        // THINK 输入控制能否让组件自我控制呢，然后父组件仅需要传入一个获取值的函数 ：？：？：？ 应该是可以的
+        // this.state = {
+        //     info: [
+        //         {}
+        //     ]
+        // }
+    }
+
+
+
+    render() {
+        return (
+            <div>
+                
+            </div>
+        )
+    }
+}
 
 
 
 
-
-
-
-
-
-
-function Button(props: {value: string, handerClick: Function, disabled: boolean}) {
+function MyButton(props: {value: string, handerClick: Function, disabled: boolean}) {
     return (
         <button onClick = {props.handerClick} disabled = {props.disabled}>{props.value}</button>
     )
 }
 
-// FLOW
 // 多个按钮 传入数据bset需要的[{value: xxx, handerClick: xxxx},...] 
 export class Buttons extends Component<{bsets: Array<{value: string, handerClick: Function, disabled: boolean}>}> {
 
@@ -207,7 +287,7 @@ export class Buttons extends Component<{bsets: Array<{value: string, handerClick
         return(
             <div>
                 {this.props.bsets.map((bset, index) => 
-                    <Button key={index} value={bset.value} handerClick={bset.handerClick} disabled={bset.disabled}/>
+                    <MyButton key={index} value={bset.value} handerClick={bset.handerClick} disabled={bset.disabled}/>
                 )}
             </div>
         )
@@ -298,9 +378,6 @@ export class Win extends Component<any> {
         }
 
 
-
-
-        // FLOW
         // 返回一个handerChange的函数
         return (e: Event) => {
             const target: any = e.target;
