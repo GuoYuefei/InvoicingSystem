@@ -120,17 +120,42 @@ type Props = any;
 // ps 第三个页面切分组件有些多表，表单外层，内层还可以在分解
 export class Adddrawer extends Component<Props> {
     jsonData: string
+    state: any
+    setState: Function
     constructor(props: Props) {
         super(props)
         // TODO 这个是造的数据
         this.jsonData = '{"arr": [{"loginname":"gyf", "character": "管理员", "name": "郭月飞"}, {"loginname":"tam", "character": "管理员", "name": "天安门"}]}';
+        this.state = {
+            modalShow: false
+        }
     }
 
     render() {
+        let modalClose = () => this.setState({ modalShow: false } );
         return(
             <div>
                 <ADTable json={this.jsonData}/>
-                <ADModal mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
+                <ADModal onHide={modalClose} show={this.state.modalShow} mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
+                <ButtonToolbar>
+                    <Button
+                        variant="primary"
+                        onClick={() => this.setState({ modalShow: true })}
+                        >
+                        增加开票人
+                    </Button>
+
+                    <Button
+                        variant="primary"
+                        onClick={() => this.setState({ modalShow: true })}
+                        >
+                        修改开票人
+                    </Button>
+                    {/* <MyVerticallyCenteredModal
+                    show={this.state.modalShow}
+                    onHide={modalClose}
+                    /> */}
+                </ButtonToolbar>
             </div>
         )
     }
@@ -195,17 +220,21 @@ class ADModal extends Component<Props> {
     constructor(props: {mbody: Component<any>}) {
         super(props)
         this.state = {
-            modalShow: false
+            
         }
     }
 
+    
+
     render() {
-        let modalClose = () => this.setState({ modalShow: false } );
+        
         return (
             <div>
                 <Modal
-                    show = {this.state.modalShow}
-                    onHide = {modalClose}
+                // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    // show = {this.props.modalShow}
+                    // onHide = {this.props.modalClose}
+                    {...this.props}
                     size="lg"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
@@ -220,23 +249,11 @@ class ADModal extends Component<Props> {
                         {this.props.mbody}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={this.props.onHide}>Close</Button>
+                        <Button onClick={this.props.modalClose}>Close</Button>
                     </Modal.Footer>
                 </Modal>
 
-                <ButtonToolbar>
-                    <Button
-                        variant="primary"
-                        onClick={() => this.setState({ modalShow: true })}
-                        >
-                        Launch vertically centered modal
-                    </Button>
-
-                    {/* <MyVerticallyCenteredModal
-                    show={this.state.modalShow}
-                    onHide={modalClose}
-                    /> */}
-                </ButtonToolbar>
+                
             </div>
         );
       }
@@ -519,6 +536,7 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
+                <Adddrawer adddrainfo={this.state.adddrainfo}/>
                 <Buttons bsets={this.state.bsets}/>
             </div>
         )
