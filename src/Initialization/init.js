@@ -323,6 +323,7 @@ export class Win extends Component<any> {
 
     // bsets: Array<{value: string, handerClick: Function, disabled: boolean}>;
     state: any;
+    stateAttrs: string[];
 
     constructor(props:any) {
         super(props);
@@ -330,6 +331,10 @@ export class Win extends Component<any> {
         //     {value: "Next", handerClick: this.handerClickNext, disabled: false},
         //     {value: "Cancel", handerClick: this.handerClick1, disabled: false}
         // ]
+        this.stateAttrs = [
+            'baseinfo',
+            'adddrainfo'
+        ]
         
         this.state = {
 
@@ -339,19 +344,21 @@ export class Win extends Component<any> {
             ],
             
             //Baseinfo
-            baseinfo: {
-                taxpayerName: {name:"taxpayerName", value:"", tip:"" , handerChange: this.handerChange("taxpayerName")},
-                taxpayerID: {name:"taxpayerID", value:"", tip:"", handerChange: this.handerChange("taxpayerID")},
-                category: {name:"category", values:[{name:"1", value:"1"},{name:"2", value:"2"}], handerChange: this.handerChange("category")},
-                billintype: {name:"billintype", values:[{name:"2", value:"2"}], handerChange: this.handerChange("billintype")} 
+            [this.stateAttrs[0]]: {
+                name: this.stateAttrs[0],
+                taxpayerName: {name:"taxpayerName", value:"", tip:"" , handerChange: this.handerChange("baseinfo.taxpayerName")},
+                taxpayerID: {name:"taxpayerID", value:"", tip:"", handerChange: this.handerChange("baseinfo.taxpayerID")},
+                category: {name:"category", value:'1', values:[{name:"1", value:"1"},{name:"2", value:"2"}], handerChange: this.handerChange("baseinfo.category")},
+                billintype: {name:"billintype", value:'2', values:[{name:"2", value:"2"},{name:"3", value:"3"}], handerChange: this.handerChange("baseinfo.billintype")} 
             },
 
             //Adddrawer
             adddrainfo: {
-                loginname: {title: "登陆名", name: "loginname", value: "", tip: "", handerChange: this.handerChange1("loginname")},
-                truename: {title: "姓名", name: "truename", value: "", tip: "", handerChange: this.handerChange1("truename")},
-                role: {title: "角色", name: "role", values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange1("role")},
-                loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange1("loginpasswd")},
+                adddrainfo: "adddrainfo",
+                loginname: {title: "登陆名", name: "loginname", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginname")},
+                truename: {title: "姓名", name: "truename", value: "", tip: "", handerChange: this.handerChange("adddrainfo.truename")},
+                role: {title: "角色", name: "role", value:'1', values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange("adddrainfo.role")},
+                loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginpasswd")},
             },
 
             /******************* */
@@ -364,13 +371,75 @@ export class Win extends Component<any> {
 
     // props里应该也有一个change的函数提供，但是那个函数只能取值，所有的值约束，改变什么的都应该由本函数返回的函数实现。
     // THINK 前期第二个页面我设计的是全由最外层组件完成，现在想想外层父组件会变得庞大。所以重新进行责任划分，将由子组件完成的工作仍然有子组件完成
-    handerChange1 = (infokey: string) => {
+    // 3.28 合并函数，减少代码量
+    // handerChange1 = (infokey: string) => {
 
+    //     let limit: Function = (str: string) => {
+    //         let patt: RegExp;
+    //         let info = this.state.adddrainfo;
+    //         let message = "";
+    //         switch(infokey) {
+    //             case info.truename.name:
+    //                 patt = /^[\u4e00-\u9fa5]{2,12}$/;
+    //                 message = patt.test(str) ? "" : "姓名应为2-12个中文字符";
+    //                 break;
+    //             case info.loginname.name:
+    //                 patt = /^[\w]{2,}$/;   
+    //                 message = patt.test(str) ? "" : "登陆名应为大于2个普通字符";
+    //                 break;
+    //             case info.loginpasswd.name:
+    //                 patt = /^.{8,20}$/;
+    //                 message = patt.test(str) ? "" : "密码应为8-20位字符"
+    //                 break;
+    //             default:
+    //                 message = "error";
+    //         }
+    //         return message;
+    //     }
+
+
+    //     // 返回一个检测change的函数
+    //     return (e: Event) => {
+    //         let info: any = this.state.adddrainfo;
+    //         let target: any = e.target;
+    //         let value: string = target.value;
+    //         info[infokey].value = value;
+
+    //         info[infokey].tip = limit(value);
+
+    //         // todo ？？？？从父组件中传入方法 怎么把数据传出到父组件呢？？？   事实证明，react的数据流只能向下流动，果断放弃
+     
+
+    //         // 从这里更加可知，这个函数不过是为了通知react进行刷新而已
+    //         this.setState(this.state);
+    //     }
+    // }
+
+
+
+    // 动态构造所需函数，减少代码量 
+    handerChange = (attr: string) => {
+
+        //分析参数
+        let attrs = attr.split('.')
+
+        // todo 这里应该对输入的内容做限制 限制函数可以写在这个函数里面
+        // TODO 新加todo，可能将来需要返回这个函数，这时候应该在外面再写一个函数，并返回这个函数
         let limit: Function = (str: string) => {
             let patt: RegExp;
-            let info = this.state.adddrainfo;
-            let message = "";
-            switch(infokey) {
+            let message: string;
+            let info = this.state[attrs[0]]
+            switch (attrs[1]) {
+                case info.taxpayerName&&info.taxpayerName.name:
+                    // 纳税人名称 ^[\u4e00-\u9fa5]{2,12}$ 中文吧，应该不会超过12个字了吧
+                    patt = /^[\u4e00-\u9fa5]{2,12}$/;
+                    message = patt.test(str) ? "" : "纳税人姓名应为2-12个中文字符"
+                    break;
+                case info.taxpayerID&&info.taxpayerID.name:
+                    // 纳税人识别码 数字15、18、20位
+                    patt = /^[0-9]{15}$|^[0-9]{18}$|^[0-9]{20}$/;
+                    message = patt.test(str) ? "" : "纳税人识别码应为15、18或者20位数字";
+                    break;
                 case info.truename.name:
                     patt = /^[\u4e00-\u9fa5]{2,12}$/;
                     message = patt.test(str) ? "" : "姓名应为2-12个中文字符";
@@ -380,52 +449,8 @@ export class Win extends Component<any> {
                     message = patt.test(str) ? "" : "登陆名应为大于2个普通字符";
                     break;
                 case info.loginpasswd.name:
-                    patt = /^.{8,20}$/;
-                    message = patt.test(str) ? "" : "密码应为8-20位字符"
-                    break;
-                default:
-                    message = "error";
-            }
-            return message;
-        }
-
-
-        // 返回一个检测change的函数
-        return (e: Event) => {
-            let info: any = this.state.adddrainfo;
-            let target: any = e.target;
-            let value: string = target.value;
-            info[infokey].value = value;
-
-            info[infokey].tip = limit(value);
-
-            // TODO ？？？？从父组件中传入方法 怎么把数据传出到父组件呢？？？   事实证明，react的数据流只能向下流动，果断放弃
-            
-
-            // 从这里更加可知，这个函数不过是为了通知react进行刷新而已
-            this.setState(this.state);
-        }
-    }
-
-
-
-    // 动态构造所需函数，减少代码量 
-    handerChange = (attr: string) => {
-        // todo 这里应该对输入的内容做限制 限制函数可以写在这个函数里面
-        // TODO 新加todo，可能将来需要返回这个函数，这时候应该在外面再写一个函数，并返回这个函数
-        let limit: Function = (str: string) => {
-            let patt: RegExp;
-            let message: string;
-            switch (attr) {
-                case this.state.baseinfo.taxpayerName.name:
-                    // 纳税人名称 ^[\u4e00-\u9fa5]{2,12}$ 中文吧，应该不会超过12个字了吧
-                    patt = /^[\u4e00-\u9fa5]{2,12}$/;
-                    message = patt.test(str) ? "" : "纳税人姓名应为2-12个中文字符"
-                    break;
-                case this.state.baseinfo.taxpayerID.name:
-                    // 纳税人识别码 数字15、18、20位
-                    patt = /^[0-9]{15}$|^[0-9]{18}$|^[0-9]{20}$/;
-                    message = patt.test(str) ? "" : "纳税人识别码应为15、18或者20位数字";
+                    patt = /^.{8,24}$/;
+                    message = patt.test(str) ? "" : "密码应为8-24位字符"
                     break;
                 default: return "error";
             }
@@ -436,37 +461,27 @@ export class Win extends Component<any> {
         // 返回一个handerChange的函数
         return (e: Event) => {
             const target: any = e.target;
-            // console.log(target,target.value);
             const value: string = target.value;
-            let alter = {value: value, tip: limit(value)}
-
+            // let alter = {value: value, tip: limit(value)}
+            let info = this.state[attrs[0]];
+            info[attrs[1]].value = value;
+            info[attrs[1]].tip = limit(value)
             // this.bsets[0].disabled = !alter.tip  
-            let bsets = this.state.bsets;
-            
-            // console.log(alter)
-            
+            let bsets = this.state.bsets;   
+ 
             // 注意这个函数不是深拷贝
-            const att = Object.assign({}, this.state.baseinfo[attr], alter)     //对select记录值，对input更新并记录值
-            
-            const baseinfo = Object.assign(
-                {}, this.state.baseinfo, {[attr]: att}
-            )
+            // const att = Object.assign({}, this.state.baseinfo[attr], alter)     //对select记录值，对input更新并记录值
 
-            // console.log(baseinfo)
-            
             // fixme 有问题，当一个输入框满足条件后就将按钮置可用 
             // 解决方案，先将tip更新入state，然后查询baseinfo的两个属性的tip，设定bsets，然后再更新一次。  react本身用的就是虚拟DOM，所以效率差不了多少
             // ps: 在写解决方案的时候发现优化方法 在setState之前就已经在本地拿到state.baseinfo了，直接做判定
-            // THINK 为什么我没将bset重新setState也能成 ？：？：？：那是因为我拿到的是引用不是内存复制，其实就是对state中bsets数组 ： solomon
-            bsets[0].disabled = baseinfo.taxpayerName.tip || baseinfo.taxpayerID.tip ? true : false;
-            
-            let state = Object.assign({}, this.state, {baseinfo})
-            console.log(state)
+            // THINK 为什么我没将bset重新setState也能成 ？：？：？：那是因为我拿到的是引用不是内存复制，其实就是对state中bsets数组 ： by solomon
+            info.taxpayerName && info.taxpayerID && (bsets[0].disabled = (!info.taxpayerName.value || !info.taxpayerID.value) || (info.taxpayerName.tip || info.taxpayerID.tip) ? true : false)
 
-            this.setState(state)
-            // this.setState((prevState, props) => ({
-            //     baseinfo: {taxpayerName:{value:target.value}}
-            // }))
+            console.log(this.state)
+
+            this.setState(this.state)
+
         } 
     }
 
@@ -492,7 +507,8 @@ export class Win extends Component<any> {
     render() {
         const mains = [
             <TimeInit />,
-            <BaseInfo info={this.state.baseinfo} />
+            <BaseInfo info={this.state.baseinfo} />,
+            <Adddrawer adddrainfo={this.state.adddrainfo}/>
         ]
 
         // TODO 将来完成后需要改，路由逻辑上要优化
@@ -503,7 +519,6 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
-                <Adddrawer adddrainfo={this.state.adddrainfo}/>
                 <Buttons bsets={this.state.bsets}/>
             </div>
         )
