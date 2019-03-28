@@ -130,7 +130,7 @@ export class Adddrawer extends Component<Props> {
         return(
             <div>
                 <ADTable json={this.jsonData}/>
-                <ADModal mbody={<AdddraForm/>}/>
+                <ADModal mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
             </div>
         )
     }
@@ -247,76 +247,21 @@ class ADModal extends Component<Props> {
 // props {title:xxx, values:[{value:xxx, name:xxx}, ...], handerChange: function(e) }
 class AdddraForm extends Component<Props> {
 
-    state: Object
-
+    adddrainfo: Object
+    // state: Object
     constructor(props) {
         super(props)
-        // TODO 先将东西放在这个组件中，以后搬运到父组件，因为父组件需要控制这个组件的输入
-        // THINK 输入控制能否让组件自我控制呢，然后父组件仅需要传入一个获取值的函数 ：？：？：？ 应该是可以的
-        this.state = {
-            info: {
-                loginname: {title: "登陆名", name: "loginname", value: "", tip: "", handerChange: this.handerChange("loginname")},
-                truename: {title: "姓名", name: "truename", value: "", tip: "", handerChange: this.handerChange("truename")},
-                role: {title: "角色", name: "role", values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange("role")},
-                loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange("loginpasswd")},
-            }
-            
-        }
+        // THINK 输入控制能否让组件自我控制呢，然后父组件仅需要传入一个获取值的函数 ：？：？：？ 应该是可以的  ///////事实证明是不可以的，除非暴露ref
+        this.adddrainfo = this.props.adddrainfo;
     }
-
-    // props里应该也有一个change的函数提供，但是那个函数只能取值，所有的值约束，改变什么的都应该由本函数返回的函数实现。
-    // THINK 前期第二个页面我设计的是全由最外层组件完成，现在想想外层父组件会变得庞大。所以重新进行责任划分，将由子组件完成的工作仍然有子组件完成
-    handerChange = (infokey: string) => {
-
-        let limit: Function = (str: string) => {
-            let patt: RegExp;
-            let info = this.state.info;
-            let message = "";
-            switch(infokey) {
-                case info.truename.name:
-                    patt = /^[\u4e00-\u9fa5]{2,12}$/;
-                    message = patt.test(str) ? "" : "姓名应为2-12个中文字符";
-                    break;
-                case info.loginname.name:
-                    patt = /^[\w]{2,}$/;   
-                    message = patt.test(str) ? "" : "登陆名应为大于2个普通字符";
-                    break;
-                case info.loginpasswd.name:
-                    patt = /^.{8,20}$/;
-                    message = patt.test(str) ? "" : "密码应为8-20位字符"
-                    break;
-                default:
-                    message = "error";
-            }
-            return message;
-        }
-
-
-        // 返回一个检测change的函数
-        return (e: Event) => {
-            let info: any = this.state.info;
-            let target: any = e.target;
-            let value: string = target.value;
-            info[infokey].value = value;
-
-            info[infokey].tip = limit(value);
-
-            // TODO ？？？？从父组件中传入方法 怎么把数据传出到父组件呢？？？   事实证明，react的数据流只能向下流动，果断放弃
-            
-
-            // 从这里更加可知，这个函数不过是为了通知react进行刷新而已
-            this.setState(this.state);
-        }
-    }
-
 
     render() {
         return (
             <div>
-                <MyInput {...this.state.info.loginname} />
-                <MyInput {...this.state.info.truename} />
-                <MySelect {...this.state.info.role} />
-                <MyInput {...this.state.info.loginpasswd} />
+                <MyInput {...this.adddrainfo.loginname} />
+                <MyInput {...this.adddrainfo.truename} />
+                <MySelect {...this.adddrainfo.role} />
+                <MyInput {...this.adddrainfo.loginpasswd} />
             </div>
         )
     }
@@ -401,6 +346,14 @@ export class Win extends Component<any> {
                 billintype: {name:"billintype", values:[{name:"2", value:"2"}], handerChange: this.handerChange("billintype")} 
             },
 
+            //Adddrawer
+            adddrainfo: {
+                loginname: {title: "登陆名", name: "loginname", value: "", tip: "", handerChange: this.handerChange1("loginname")},
+                truename: {title: "姓名", name: "truename", value: "", tip: "", handerChange: this.handerChange1("truename")},
+                role: {title: "角色", name: "role", values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange1("role")},
+                loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange1("loginpasswd")},
+            },
+
             /******************* */
 
             // main: this.mains[0], 
@@ -408,6 +361,53 @@ export class Win extends Component<any> {
             // buttons: <Buttons bsets={this.state.bsets} />
         }
     }
+
+    // props里应该也有一个change的函数提供，但是那个函数只能取值，所有的值约束，改变什么的都应该由本函数返回的函数实现。
+    // THINK 前期第二个页面我设计的是全由最外层组件完成，现在想想外层父组件会变得庞大。所以重新进行责任划分，将由子组件完成的工作仍然有子组件完成
+    handerChange1 = (infokey: string) => {
+
+        let limit: Function = (str: string) => {
+            let patt: RegExp;
+            let info = this.state.adddrainfo;
+            let message = "";
+            switch(infokey) {
+                case info.truename.name:
+                    patt = /^[\u4e00-\u9fa5]{2,12}$/;
+                    message = patt.test(str) ? "" : "姓名应为2-12个中文字符";
+                    break;
+                case info.loginname.name:
+                    patt = /^[\w]{2,}$/;   
+                    message = patt.test(str) ? "" : "登陆名应为大于2个普通字符";
+                    break;
+                case info.loginpasswd.name:
+                    patt = /^.{8,20}$/;
+                    message = patt.test(str) ? "" : "密码应为8-20位字符"
+                    break;
+                default:
+                    message = "error";
+            }
+            return message;
+        }
+
+
+        // 返回一个检测change的函数
+        return (e: Event) => {
+            let info: any = this.state.adddrainfo;
+            let target: any = e.target;
+            let value: string = target.value;
+            info[infokey].value = value;
+
+            info[infokey].tip = limit(value);
+
+            // TODO ？？？？从父组件中传入方法 怎么把数据传出到父组件呢？？？   事实证明，react的数据流只能向下流动，果断放弃
+            
+
+            // 从这里更加可知，这个函数不过是为了通知react进行刷新而已
+            this.setState(this.state);
+        }
+    }
+
+
 
     // 动态构造所需函数，减少代码量 
     handerChange = (attr: string) => {
@@ -503,7 +503,7 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
-                <Adddrawer />
+                <Adddrawer adddrainfo={this.state.adddrainfo}/>
                 <Buttons bsets={this.state.bsets}/>
             </div>
         )
