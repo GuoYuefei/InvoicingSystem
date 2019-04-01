@@ -1,7 +1,7 @@
 // @flow
 // 主要写初始化部分的组件
 import React, { Component } from 'react';
-import {Table, Modal, Button, ButtonToolbar} from 'react-bootstrap'
+import {Table, Modal, Button, ButtonToolbar, ButtonGroup} from 'react-bootstrap'
 
 // 第一个页面
 export class TimeInit extends Component<any> {
@@ -116,18 +116,72 @@ export class BaseInfo extends Component<any> {
 // FLOW 因为props类型难以确定所以用any代替
 type Props = any;
 
-// TODO 第三个页面
+// TODO 第三个页面 第三页面在按下一步的时候应该需要让其修改管理密码和密保
 // ps 第三个页面切分组件有些多表，表单外层，内层还可以在分解
 export class Adddrawer extends Component<Props> {
     jsonData: string
     state: any
     setState: Function
+    confirm: {name: string, fun: Function}
+    adddrainfo: any
+    increase: Array<{loginname: string, role: string, truename: string, loginpasswd: string}>
+    
     constructor(props: Props) {
         super(props)
         // TODO 这个是造的数据
-        this.jsonData = '{"arr": [{"loginname":"gyf", "character": "管理员", "name": "郭月飞"}, {"loginname":"tam", "character": "管理员", "name": "天安门"}]}';
+        // this.jsonData = '{"arr": [{"loginname":"gyf", "role": "管理员", "truename": "郭月飞"}, {"loginname":"tam", "role": "管理员", "truename": "天安门"}]}';
         this.state = {
-            modalShow: false
+            modalShow: false,
+            jsonData: '{"arr": [{"loginname":"gyf", "role": "管理员", "truename": "郭月飞"}, {"loginname":"tam", "role": "管理员", "truename": "天安门"}]}',
+        }
+        // THINK 父组件在刷新的时候会重建子组件，组件在自我刷新的时候，只执行render函数并仅刷新已改变的值
+        // this.adddrainfo = JSON.parse(JSON.stringify(this.props.adddrainfo))
+
+        this.increase = []
+        
+        // modal ok按钮props
+        this.confirm = {
+            name: "OK",
+            fun: () => {
+                let info = this.props.adddrainfo
+                let user = {
+                    [info.loginname.name]: info.loginname.value,
+                    [info.role.name]: info.role.value,
+                    [info.truename.name]: info.truename.value, 
+                    [info.loginpasswd.name]: info.loginpasswd.value
+                }
+                // todo  保存数据，这是将来有用的 特别是数据库录入的时候   
+                this.increase.push(user)
+                // TODO 将改变的数据传递到父组件, 接下来父组件应该去做些事情
+                this.props.getresult(this.increase)
+                let state = this.state
+                let jsonData = JSON.parse(state.jsonData)
+                jsonData.arr.push(user)
+                state.jsonData = JSON.stringify(jsonData)
+                // console.log(state)
+                this.setState(state)
+            }
+        }
+    }
+
+    // 删除应要添加的用户信息 这个函数是用click的，所以得根据参数返回一个无参函数
+    delete = (loginname: string) => {
+        
+
+        return () => {
+            console.log(this.increase)
+            this.increase.forEach((value, index, increase) => {
+                // TODO 初始化的时候应该只有increase列表里的才能删除
+                // console.log("jinlaile ", value.loginname, loginname)
+                value.loginname === loginname && increase.splice(index, 1)
+            })
+            let state = this.state
+            let jsonData = JSON.parse(state.jsonData)
+            jsonData.arr.forEach((value, index, arr) => {
+                value.loginname === loginname && arr.splice(index, 1)
+            })
+            state.jsonData = JSON.stringify(jsonData)
+            this.setState(state)
         }
     }
 
@@ -135,21 +189,15 @@ export class Adddrawer extends Component<Props> {
         let modalClose = () => this.setState({ modalShow: false } );
         return(
             <div>
-                <ADTable json={this.jsonData}/>
-                <ADModal onHide={modalClose} show={this.state.modalShow} mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
+                <ADTable delete={this.delete} json={this.state.jsonData}/>
+                <ADModal onHide={modalClose} confirm={this.confirm} show={this.state.modalShow} mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
                 <ButtonToolbar>
                     <Button
+                        className="ml-2 mr-4"
                         variant="primary"
                         onClick={() => this.setState({ modalShow: true })}
                         >
                         增加开票人
-                    </Button>
-
-                    <Button
-                        variant="primary"
-                        onClick={() => this.setState({ modalShow: true })}
-                        >
-                        修改开票人
                     </Button>
                     {/* <MyVerticallyCenteredModal
                     show={this.state.modalShow}
@@ -174,15 +222,16 @@ class ADTable extends Component<Props> {
     // 生成tbody
     // json {arr: [{loginname:xxx, character: xxx, name: xxx}]}
     renderTbody(json: string) {
-        console.log(json)
+        // console.log(json)
         let obs = JSON.parse(json).arr;
-        console.log(obs)
+        // console.log(obs)
         const trs = obs.map((ob, index) => 
             <tr key={index}>
                 <td>{index}</td>
                 <td>{ob.loginname}</td>
-                <td>{ob.character}</td>
-                <td>{ob.name}</td>
+                <td>{ob.role}</td>
+                <td>{ob.truename}</td>
+                <td><Button onClick={this.props.delete(ob.loginname)}>删除</Button></td>
             </tr>
         )
         return (
@@ -202,6 +251,7 @@ class ADTable extends Component<Props> {
                     <th>开票人登录名</th>
                     <th>角色</th>
                     <th>姓名</th>
+                    <th>操作</th>
                     </tr>
                 </thead>
                 {this.renderTbody(this.props.json)}
@@ -249,7 +299,15 @@ class ADModal extends Component<Props> {
                         {this.props.mbody}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={this.props.modalClose}>Close</Button>
+                    <ButtonToolbar aria-label="Toolbar with button groups">
+                    <ButtonGroup className="mr-2" aria-label="First group">
+                        <Button onClick={this.props.confirm.fun}>{this.props.confirm.name}</Button>
+                    </ButtonGroup>
+                    <ButtonGroup className="mr-2" aria-label="Third group">
+                        {/* THINK 可以通过向子组件传递函数来让子组件有改变父组件的能力 */}
+                        <Button onClick={this.props.onHide}>Close</Button>
+                    </ButtonGroup>
+                    </ButtonToolbar>
                     </Modal.Footer>
                 </Modal>
 
@@ -283,6 +341,9 @@ class AdddraForm extends Component<Props> {
         )
     }
 }
+
+// TODO 期初数据录入
+class DataInit extends Component<Props> {}
 
 
 
@@ -341,6 +402,7 @@ export class Win extends Component<any> {
     // bsets: Array<{value: string, handerClick: Function, disabled: boolean}>;
     state: any;
     stateAttrs: string[];
+    adddrainfos: Array<any>
 
     constructor(props:any) {
         super(props);
@@ -377,6 +439,7 @@ export class Win extends Component<any> {
                 role: {title: "角色", name: "role", value:'1', values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange("adddrainfo.role")},
                 loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginpasswd")},
             },
+            
 
             /******************* */
 
@@ -384,6 +447,14 @@ export class Win extends Component<any> {
             mainCounter: 0,
             // buttons: <Buttons bsets={this.state.bsets} />
         }
+        //用这个数组去存取第三页面添加的全部用户属性
+        this.adddrainfos=[];
+    }
+
+
+    // 传入第三页面获取做出改变的数据
+    addDrainfo = (result: Array<any>) => {
+        this.adddrainfos.push(...result)
     }
 
     // props里应该也有一个change的函数提供，但是那个函数只能取值，所有的值约束，改变什么的都应该由本函数返回的函数实现。
@@ -495,7 +566,7 @@ export class Win extends Component<any> {
             // THINK 为什么我没将bset重新setState也能成 ？：？：？：那是因为我拿到的是引用不是内存复制，其实就是对state中bsets数组 ： by solomon
             info.taxpayerName && info.taxpayerID && (bsets[0].disabled = (!info.taxpayerName.value || !info.taxpayerID.value) || (info.taxpayerName.tip || info.taxpayerID.tip) ? true : false)
 
-            console.log(this.state)
+            // console.log(this.state)
 
             this.setState(this.state)
 
@@ -512,6 +583,7 @@ export class Win extends Component<any> {
         console.log("this is handerClick2")
         //暂存信息 todo ps.值已经在handerChange中记录了
 
+        
 
         //切换页面
         let mainCounter = this.state.mainCounter
@@ -525,7 +597,7 @@ export class Win extends Component<any> {
         const mains = [
             <TimeInit />,
             <BaseInfo info={this.state.baseinfo} />,
-            <Adddrawer adddrainfo={this.state.adddrainfo}/>
+            <Adddrawer getresult={this.addDrainfo} adddrainfo={this.state.adddrainfo}/>
         ]
 
         // TODO 将来完成后需要改，路由逻辑上要优化
@@ -536,7 +608,7 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
-                <Adddrawer adddrainfo={this.state.adddrainfo}/>
+                <Adddrawer getresult={this.addDrainfo} adddrainfo={this.state.adddrainfo}/>
                 <Buttons bsets={this.state.bsets}/>
             </div>
         )
