@@ -1,7 +1,7 @@
 // @flow
 // 主要写初始化部分的组件
 import React, { Component } from 'react';
-import {Table, Modal, Button, ButtonToolbar, ButtonGroup} from 'react-bootstrap'
+import {Table, Form, Modal, Container, Button, ButtonToolbar, ButtonGroup, Col} from 'react-bootstrap'
 
 // 第一个页面
 export class TimeInit extends Component<any> {
@@ -42,7 +42,7 @@ export class TimeInit extends Component<any> {
 }
 // 第一个页面end
 
-type TYPEInputProps = {type?: string, title: string, name?: string, tip?: string, value: string, handerChange?: Function}
+type TYPEInputProps = {type?: string, placeholder?: string, title: string, name?: string, tip?: string, value: string, handerChange: Function}
 
 // 正常输入框 使用状态提升
 // props {title:xxx, [name: xxx], [tip:xxx], value:xxx, handerChange: function(e) }
@@ -50,30 +50,40 @@ type TYPEInputProps = {type?: string, title: string, name?: string, tip?: string
 // FLOW 对象可选属性用?: 。函数可选参数用:?, 变态的flow 
 function MyInput(props: TYPEInputProps) {
     return (
-        <div>
-            <label>{props.title+":\t"}</label>
-            <input type={props.type || 'text'} name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
+        <Col>
+            <Form.Label>{props.title+":"}</Form.Label>
+
+            <Form.Control type={props.type || 'text'} placeholder={props.placeholder || ''} name={props.name||'undefined'} value={props.value} onChange={props.handerChange} />
             {
                     // todo新加的提示文本，在外层实现后将TODO改成todo
                     props.tip && <span style={{color:"red"}}>{props.tip} </span>
             }
-        </div>
+        </Col>
     )
 }
 
+type TYPESelectProps = {title: string, name?: string, values:Array<{value: string, name: string}>, handerChange: Function}
+
 // 正常下拉框 使用状态提升
-// props {title:xxx, values:[{value:xxx, name:xxx}, ...], handerChange: function(e) }
-function MySelect(props) {
+// props {title:xxx, name?: string values:[{value:xxx, name:xxx}, ...], handerChange: function(e) }
+function MySelect(props: TYPESelectProps) {
     return (
-        <div>
-            <label>{props.title+":\t"}</label>
-            <select name={props.name||'undefined'} onChange={props.handerChange}>
+        <Col>
+            <Form.Label>{props.title+":"}</Form.Label>
+            <Form.Control as="select" name={props.name||'undefined'} onChange={props.handerChange}>
                 {props.values.map((value, index) => 
                     <option key={index} value={value.value}>{value.name}</option>
                 )}
-            </select>
-        </div>
+            </Form.Control>
+        </Col>
     )
+}
+
+type TypeAllPutProps = TYPEInputProps | TYPESelectProps
+
+// 4.2 新加表单组件，为建立高复用表单而建设
+function AllPut(props: TypeAllPutProps) {
+    return props.type && props.type==='select' ? <MySelect {...props} /> : <MyInput {...props} />
 }
 
 //第二个页面
@@ -101,12 +111,12 @@ export class BaseInfo extends Component<any> {
         return(
             <div>
                 {/* THINK {新get的写法，传入参数同名的情况下可以简写，es6} */}
-                <MyInput {...info.taxpayerName} title={info.taxpayerName.title||this.titles[0]} />
-                <MyInput name={info.taxpayerID.name} tip={info.taxpayerID.tip} title={info.taxpayerID.title||this.titles[1]}
+                <AllPut {...info.taxpayerName} title={info.taxpayerName.title||this.titles[0]} />
+                <AllPut name={info.taxpayerID.name} tip={info.taxpayerID.tip} title={info.taxpayerID.title||this.titles[1]}
                     value={info.taxpayerID.value} handerChange={info.taxpayerID.handerChange} />
-                <MySelect name={info.category.name} title={info.category.title||this.titles[2]} 
+                <AllPut type="select" name={info.category.name} title={info.category.title||this.titles[2]} 
                     values={info.category.values} handerChange={info.category.handerChange} />
-                <MySelect name={info.billintype.name} title={info.billintype.title||this.titles[3]} 
+                <AllPut type="select" name={info.billintype.name} title={info.billintype.title||this.titles[3]} 
                     values={info.billintype.values} handerChange={info.billintype.handerChange} />
             </div>
         )
@@ -125,6 +135,7 @@ export class Adddrawer extends Component<Props> {
     confirm: {name: string, fun: Function}
     adddrainfo: any
     increase: Array<{loginname: string, role: string, truename: string, loginpasswd: string}>
+    tableHead: Array<string>
     
     constructor(props: Props) {
         super(props)
@@ -134,6 +145,9 @@ export class Adddrawer extends Component<Props> {
             modalShow: false,
             jsonData: '{"arr": [{"loginname":"gyf", "role": "管理员", "truename": "郭月飞"}, {"loginname":"tam", "role": "管理员", "truename": "天安门"}]}',
         }
+
+        this.tableHead = ["开票人登录名", "角色", "姓名"]
+
         // THINK 父组件在刷新的时候会重建子组件，组件在自我刷新的时候，只执行render函数并仅刷新已改变的值
         // this.adddrainfo = JSON.parse(JSON.stringify(this.props.adddrainfo))
 
@@ -148,18 +162,21 @@ export class Adddrawer extends Component<Props> {
                     [info.loginname.name]: info.loginname.value,
                     [info.role.name]: info.role.value,
                     [info.truename.name]: info.truename.value, 
-                    [info.loginpasswd.name]: info.loginpasswd.value
+                    // [info.loginpasswd.name]: info.loginpasswd.value
                 }
-                // todo  保存数据，这是将来有用的 特别是数据库录入的时候   
-                this.increase.push(user)
-                // TODO 将改变的数据传递到父组件, 接下来父组件应该去做些事情
-                this.props.getresult(this.increase)
+                
                 let state = this.state
                 let jsonData = JSON.parse(state.jsonData)
                 jsonData.arr.push(user)
                 state.jsonData = JSON.stringify(jsonData)
                 // console.log(state)
                 this.setState(state)
+
+                user[info.loginpasswd.name] = info.loginpasswd.value
+                // todo  保存数据，这是将来有用的 特别是数据库录入的时候   
+                this.increase.push(user)
+                // TODO 将改变的数据传递到父组件, 接下来父组件应该去做些事情
+                this.props.getresult(this.increase)
             }
         }
     }
@@ -189,8 +206,8 @@ export class Adddrawer extends Component<Props> {
         let modalClose = () => this.setState({ modalShow: false } );
         return(
             <div>
-                <ADTable delete={this.delete} json={this.state.jsonData}/>
-                <ADModal onHide={modalClose} confirm={this.confirm} show={this.state.modalShow} mbody={<AdddraForm adddrainfo={this.props.adddrainfo}/>}/>
+                <ADTable delete={this.delete} tableHead={this.tableHead} json={this.state.jsonData}/>
+                <ADModal onHide={modalClose} confirm={this.confirm} show={this.state.modalShow} title={"增加开票人"} mbody={<AdddraForm {...this.props}/>}/>
                 <ButtonToolbar>
                     <Button
                         className="ml-2 mr-4"
@@ -209,31 +226,40 @@ export class Adddrawer extends Component<Props> {
     }
 }
 
+type TYPETable = {delete?: Function, tableHead: Array<string>, json: string}
+// ps. json格式 {arr: Array<>}
+
 // table主体
+// 4.2 统一表格，大大提高复用性 思考： 表单也可以实现高复用
 class ADTable extends Component<Props> {
 
     renderTbody: Function
 
-    constructor(props: {arr:{loginname:string, character: string, name: string}[]}) {
+    constructor(props) {
         super(props)
         this.renderTbody = this.renderTbody.bind(this)
     }
 
     // 生成tbody
-    // json {arr: [{loginname:xxx, character: xxx, name: xxx}]}
+    // json {arr: [{loginname:xxx, role: xxx, name: xxx}]}
     renderTbody(json: string) {
         // console.log(json)
         let obs = JSON.parse(json).arr;
         // console.log(obs)
-        const trs = obs.map((ob, index) => 
-            <tr key={index}>
-                <td>{index}</td>
-                <td>{ob.loginname}</td>
-                <td>{ob.role}</td>
-                <td>{ob.truename}</td>
-                <td><Button onClick={this.props.delete(ob.loginname)}>删除</Button></td>
-            </tr>
-        )
+        const trs = obs.map((ob, index) => {
+            let obToArr: Array<any> = Object.values(ob)
+            return (
+                <tr key={index}>
+                    <td>{index}</td>
+                    {
+                        obToArr.map((value, index) => 
+                            <td key={index}>{value}</td>
+                        )
+                    }
+                    {this.props.delete && <td><Button onClick={this.props.delete(ob.loginname)}>删除</Button></td>}
+                </tr>
+            )
+        })
         return (
             <tbody>
                 {trs}
@@ -248,10 +274,10 @@ class ADTable extends Component<Props> {
                 <thead>
                     <tr>
                     <th>#</th>
-                    <th>开票人登录名</th>
-                    <th>角色</th>
-                    <th>姓名</th>
-                    <th>操作</th>
+                    {this.props.tableHead.map((value, index) => 
+                        <th key={index}>{value}</th>
+                    )}
+                    {this.props.delete && <th>操作</th>}
                     </tr>
                 </thead>
                 {this.renderTbody(this.props.json)}
@@ -260,7 +286,7 @@ class ADTable extends Component<Props> {
     }
 }
 
-// TODO 增加开票人的模态框
+// TODO 增加开票人的模态框 当然这个模态框可以运用于其他地方
 // 这里只提供一个模态框，但是Body内容有参数生成
 class ADModal extends Component<Props> {
 
@@ -273,8 +299,6 @@ class ADModal extends Component<Props> {
             
         }
     }
-
-    
 
     render() {
         
@@ -291,18 +315,20 @@ class ADModal extends Component<Props> {
                 >
                     <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        增加开票人
+                        {this.props.title}
                     </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <h4>Centered Modal</h4>
                         {this.props.mbody}
                     </Modal.Body>
                     <Modal.Footer>
                     <ButtonToolbar aria-label="Toolbar with button groups">
-                    <ButtonGroup className="mr-2" aria-label="First group">
-                        <Button onClick={this.props.confirm.fun}>{this.props.confirm.name}</Button>
-                    </ButtonGroup>
+                    {
+                        this.props.confirm && 
+                        <ButtonGroup className="mr-2" aria-label="First group">
+                            <Button onClick={this.props.confirm.fun}>{this.props.confirm.name}</Button>
+                        </ButtonGroup>
+                    }
                     <ButtonGroup className="mr-2" aria-label="Third group">
                         {/* THINK 可以通过向子组件传递函数来让子组件有改变父组件的能力 */}
                         <Button onClick={this.props.onHide}>Close</Button>
@@ -311,7 +337,6 @@ class ADModal extends Component<Props> {
                     </Modal.Footer>
                 </Modal>
 
-                
             </div>
         );
       }
@@ -342,8 +367,73 @@ class AdddraForm extends Component<Props> {
     }
 }
 
-// TODO 期初数据录入
-class DataInit extends Component<Props> {}
+// TODO 第四个页面 期初数据录入
+class DataInit extends Component<Props> {
+    jsonData: string
+    tableHead: Array<string>
+    setState: Function
+    state: any
+
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            modalShow: false
+        }
+
+        this.jsonData = '{"arr": [{"invoiceCode":"123456", "begin": "0000", "end":"0100", "number": "100"}]}';
+        this.tableHead = ["发票代码", "开始号码", "截至号码", "份数"]
+    }
+
+
+    render() {
+        let modalClose = () => this.setState({ modalShow: false } );
+        return (
+            <div>
+                <ADTable tableHead={this.tableHead} json={this.jsonData} />
+                <ADModal onHide={modalClose} show={this.state.modalShow} title="增加记录" mbody={<MyForm info={this.props.dataInitInfo}/>}/>
+                <ButtonToolbar>
+                    <Button
+                        className="ml-2 mr-4"
+                        variant="primary"
+                        onClick={() => this.setState({ modalShow: true })}
+                        >
+                        增加记录
+                    </Button>
+                    {/* <MyVerticallyCenteredModal
+                    show={this.state.modalShow}
+                    onHide={modalClose}
+                    /> */}
+                </ButtonToolbar>
+            </div>
+        )
+    }
+}
+
+//                  invoiceCode: {title:"发票代码", name: "invoiceCode", value: "", tip: "", handerChange: (e)=>{} },
+//                 begin: {title:"开始号码", name: "begin", value: "", tip: "", handerChange: (e)=>{} },
+//                 end: {title: "截至号码", name: "end", value: "", tip:"", handerChange: (e)=>{} },
+//                 date: {title: "购票日期", name: "date", value: "", tip: "", handerChange: (e)=>{} }
+
+// 先定义props的格式
+type MyFormProps = {info: Array<TypeAllPutProps>}
+
+// TODO 打算写一个通用表单 由于前面已经有专用表单存在，所以可能不会进行代码的统一
+// 在第四个页面后的所有表单都使用通用表单 参数类型如上定义
+// 而在Win组件中，对象集合应该变成对象数组集合 （方便）
+class MyForm extends Component<MyFormProps> {
+
+    render() {
+
+        return (
+            <div>
+                {this.props.info.map((value, index, arr) => 
+                    <AllPut key={index} {...value} />
+                )}
+            </div>
+        )
+    }
+}
 
 
 
@@ -412,7 +502,8 @@ export class Win extends Component<any> {
         // ]
         this.stateAttrs = [
             'baseinfo',
-            'adddrainfo'
+            'adddrainfo',
+            'dataInitInfo'
         ]
         
         this.state = {
@@ -424,21 +515,30 @@ export class Win extends Component<any> {
             
             //Baseinfo
             [this.stateAttrs[0]]: {
-                name: this.stateAttrs[0],
-                taxpayerName: {name:"taxpayerName", value:"", tip:"" , handerChange: this.handerChange("baseinfo.taxpayerName")},
-                taxpayerID: {name:"taxpayerID", value:"", tip:"", handerChange: this.handerChange("baseinfo.taxpayerID")},
-                category: {name:"category", value:'1', values:[{name:"1", value:"1"},{name:"2", value:"2"}], handerChange: this.handerChange("baseinfo.category")},
-                billintype: {name:"billintype", value:'2', values:[{name:"2", value:"2"},{name:"3", value:"3"}], handerChange: this.handerChange("baseinfo.billintype")} 
+                // name: this.stateAttrs[0],
+                taxpayerName: {name: "taxpayerName", value: "", tip: "", handerChange: this.handerChange("baseinfo.taxpayerName")},
+                taxpayerID: {name: "taxpayerID", value: "", tip:"", handerChange: this.handerChange("baseinfo.taxpayerID")},
+                category: {name: "category", value: '1', values:[{name: "1", value: "1"},{name: "2", value: "2"}], handerChange: this.handerChange("baseinfo.category")},
+                billintype: {name: "billintype", value: '2', values:[{name: "2", value: "2"},{name: "3", value: "3"}], handerChange: this.handerChange("baseinfo.billintype")} 
             },
 
             //Adddrawer
             adddrainfo: {
-                adddrainfo: "adddrainfo",
+                // name: "adddrainfo",
                 loginname: {title: "登陆名", name: "loginname", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginname")},
                 truename: {title: "姓名", name: "truename", value: "", tip: "", handerChange: this.handerChange("adddrainfo.truename")},
-                role: {title: "角色", name: "role", value:'1', values: [{value:'1', name:'1'}, {value:'2', name:'2'}], handerChange: this.handerChange("adddrainfo.role")},
-                loginpasswd: {type:"password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginpasswd")},
+                role: {title: "角色", name: "role", value: '1', values: [{value: '1', name: '1'}, {value: '2', name: '2'}], handerChange: this.handerChange("adddrainfo.role")},
+                loginpasswd: {type: "password", title: "登陆密码", name: "loginpasswd", value: "", tip: "", handerChange: this.handerChange("adddrainfo.loginpasswd")},
             },
+
+            // 从第四个页面开始使用更加抽象的自定义表单，表格和modal
+            [this.stateAttrs[2]]: [
+                // name: this.stateAttrs[2],
+                {title:"发票代码", name: "invoiceCode", value: "", tip: "", handerChange: (e)=>{} },
+                {title:"开始号码", name: "begin", value: "", tip: "", handerChange: (e)=>{} },
+                {title: "截至号码", name: "end", value: "", tip:"", handerChange: (e)=>{} },
+                {title: "购票日期", name: "date", value: "", tip: "", handerChange: (e)=>{} }
+            ],
             
 
             /******************* */
@@ -528,19 +628,19 @@ export class Win extends Component<any> {
                     patt = /^[0-9]{15}$|^[0-9]{18}$|^[0-9]{20}$/;
                     message = patt.test(str) ? "" : "纳税人识别码应为15、18或者20位数字";
                     break;
-                case info.truename.name:
+                case info.truename&&info.truename.name:
                     patt = /^[\u4e00-\u9fa5]{2,12}$/;
                     message = patt.test(str) ? "" : "姓名应为2-12个中文字符";
                     break;
-                case info.loginname.name:
+                case info.loginname&&info.loginname.name:
                     patt = /^[\w]{2,}$/;   
                     message = patt.test(str) ? "" : "登陆名应为大于2个普通字符";
                     break;
-                case info.loginpasswd.name:
+                case info.loginpasswd&&info.loginpasswd.name:
                     patt = /^.{8,24}$/;
                     message = patt.test(str) ? "" : "密码应为8-24位字符"
                     break;
-                default: return "error";
+                default: return "";
             }
             return message;
         }
@@ -604,13 +704,14 @@ export class Win extends Component<any> {
         const main = mains[this.state.mainCounter>=mains.length?mains.length-1:this.state.mainCounter]
         // const main = this.mains[this.state.mainCounter]
         return (
-            <div>
+            <Container>
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
                 <Adddrawer getresult={this.addDrainfo} adddrainfo={this.state.adddrainfo}/>
+                <DataInit dataInitInfo={this.state.dataInitInfo} />
                 <Buttons bsets={this.state.bsets}/>
-            </div>
+            </Container>
         )
     }
 }
