@@ -182,20 +182,19 @@ export class Adddrawer extends Component<Props> {
     }
 
     // 删除应要添加的用户信息 这个函数是用click的，所以得根据参数返回一个无参函数
-    delete = (loginname: string) => {
-        
+    delete = (ob: any) => {
 
         return () => {
             console.log(this.increase)
             this.increase.forEach((value, index, increase) => {
                 // TODO 初始化的时候应该只有increase列表里的才能删除
                 // console.log("jinlaile ", value.loginname, loginname)
-                value.loginname === loginname && increase.splice(index, 1)
+                value.loginname === ob.loginname && increase.splice(index, 1)
             })
             let state = this.state
             let jsonData = JSON.parse(state.jsonData)
             jsonData.arr.forEach((value, index, arr) => {
-                value.loginname === loginname && arr.splice(index, 1)
+                value.loginname === ob.loginname && arr.splice(index, 1)
             })
             state.jsonData = JSON.stringify(jsonData)
             this.setState(state)
@@ -231,7 +230,7 @@ type TYPETable = {delete?: Function, tableHead: Array<string>, json: string}
 
 // table主体
 // 4.2 统一表格，大大提高复用性 思考： 表单也可以实现高复用
-class ADTable extends Component<Props> {
+class ADTable extends Component<TYPETable> {
 
     renderTbody: Function
 
@@ -256,7 +255,7 @@ class ADTable extends Component<Props> {
                             <td key={index}>{value}</td>
                         )
                     }
-                    {this.props.delete && <td><Button onClick={this.props.delete(ob.loginname)}>删除</Button></td>}
+                    {this.props.delete && <td><Button onClick={this.props.delete(ob)}>删除</Button></td>}
                 </tr>
             )
         })
@@ -373,16 +372,65 @@ class DataInit extends Component<Props> {
     tableHead: Array<string>
     setState: Function
     state: any
+    confirm: any
+    increase: Array<{invoiceCode: string, begin: string, end: string, date: Date, number: number}>
+    delete: Function
 
     constructor(props) {
         super(props)
 
         this.state = {
-            modalShow: false
+            modalShow: false,
+            jsonData: '{"arr": [{"invoiceCode":"123456", "begin": "0000", "end":"0100", "number": "100"}]}'
         }
 
-        this.jsonData = '{"arr": [{"invoiceCode":"123456", "begin": "0000", "end":"0100", "number": "100"}]}';
+        this.increase = []
+
         this.tableHead = ["发票代码", "开始号码", "截至号码", "份数"]
+    }
+
+    //confirm对象
+    confirm = {
+        name: "确定",
+        fun: () => {
+            let jsonData = JSON.parse(this.state.jsonData)
+            let invoiceInfo: any = {
+                invoiceCode: this.props.dataInitInfo.invoiceCode.value,
+                begin: this.props.dataInitInfo.begin.value,
+                end: this.props.dataInitInfo.end.value,
+                number: this.props.dataInitInfo.end.value-this.props.dataInitInfo.begin.value
+            }
+            jsonData.arr.push(invoiceInfo)
+            let state = this.state
+            state.jsonData = JSON.stringify(jsonData)
+            console.log(state.jsonData)
+            this.setState(state)
+
+            invoiceInfo.date = this.props.dataInitInfo.date.value
+            this.increase.push(invoiceInfo)
+            this.props.getresult(this.increase)
+
+        }
+    }
+
+    delete = (ob: Object) => {
+
+        return () => {
+
+
+            this.increase.forEach((value, index, increase) => {
+                // TODO 初始化的时候应该只有increase列表里的才能删除
+                // console.log("jinlaile ", value.loginname, loginname)
+                value.invoiceCode === ob.invoiceCode && increase.splice(index, 1)
+            })
+            let state = this.state
+            let jsonData = JSON.parse(state.jsonData)
+            jsonData.arr.forEach((value, index, arr) => {
+                value.invoiceCode === ob.invoiceCode && arr.splice(index, 1)
+            })
+            state.jsonData = JSON.stringify(jsonData)
+            this.setState(state)
+        }
     }
 
 
@@ -390,20 +438,16 @@ class DataInit extends Component<Props> {
         let modalClose = () => this.setState({ modalShow: false } );
         return (
             <div>
-                <ADTable tableHead={this.tableHead} json={this.jsonData} />
-                <ADModal onHide={modalClose} show={this.state.modalShow} title="增加记录" mbody={<MyForm info={this.props.dataInitInfo}/>}/>
+                <ADTable delete={this.delete} tableHead={this.tableHead} json={this.state.jsonData} />
+                <ADModal onHide={modalClose} show={this.state.modalShow} confirm={this.confirm} title="增加记录" mbody={<MyForm info={this.props.dataInitInfo}/>}/>
                 <ButtonToolbar>
                     <Button
-                        className="ml-2 mr-4"
+                        className="ml-2 mr-2"
                         variant="primary"
                         onClick={() => this.setState({ modalShow: true })}
                         >
                         增加记录
                     </Button>
-                    {/* <MyVerticallyCenteredModal
-                    show={this.state.modalShow}
-                    onHide={modalClose}
-                    /> */}
                 </ButtonToolbar>
             </div>
         )
@@ -416,18 +460,19 @@ class DataInit extends Component<Props> {
 //                 date: {title: "购票日期", name: "date", value: "", tip: "", handerChange: (e)=>{} }
 
 // 先定义props的格式
-type MyFormProps = {info: Array<TypeAllPutProps>}
+// type MyFormProps = {Array<TypeAllPutProps>}
 
 // TODO 打算写一个通用表单 由于前面已经有专用表单存在，所以可能不会进行代码的统一
 // 在第四个页面后的所有表单都使用通用表单 参数类型如上定义
-// 而在Win组件中，对象集合应该变成对象数组集合 （方便）
-class MyForm extends Component<MyFormProps> {
+// 而在Win组件中，对象集合应该变成对象数组集合 （方便） 转换数组过程由这个函数代劳，传入数据和原Form组件相同
+class MyForm extends Component<Props> {
 
     render() {
+        let infos: Array<mixed> = Object.values(this.props.info)
 
         return (
             <div>
-                {this.props.info.map((value, index, arr) => 
+                {infos.map((value, index, arr) => 
                     <AllPut key={index} {...value} />
                 )}
             </div>
@@ -493,6 +538,7 @@ export class Win extends Component<any> {
     state: any;
     stateAttrs: string[];
     adddrainfos: Array<any>
+    dataInitInfos: Array<any>
 
     constructor(props:any) {
         super(props);
@@ -532,13 +578,13 @@ export class Win extends Component<any> {
             },
 
             // 从第四个页面开始使用更加抽象的自定义表单，表格和modal
-            [this.stateAttrs[2]]: [
+            [this.stateAttrs[2]]: {
                 // name: this.stateAttrs[2],
-                {title:"发票代码", name: "invoiceCode", value: "", tip: "", handerChange: (e)=>{} },
-                {title:"开始号码", name: "begin", value: "", tip: "", handerChange: (e)=>{} },
-                {title: "截至号码", name: "end", value: "", tip:"", handerChange: (e)=>{} },
-                {title: "购票日期", name: "date", value: "", tip: "", handerChange: (e)=>{} }
-            ],
+                invoiceCode: {title:"发票代码", name: "invoiceCode", value: "", tip: "", handerChange: this.handerChange("dataInitInfo.invoiceCode") },
+                begin: {title:"开始号码", name: "begin", value: "", tip: "", handerChange: this.handerChange("dataInitInfo.begin") },
+                end: {title: "截至号码", name: "end", value: "", tip:"", handerChange: this.handerChange("dataInitInfo.end") },
+                date: {title: "购票日期", type: "date", name: "date", value: "", tip: "", handerChange: this.handerChange("dataInitInfo.date") }
+            },
             
 
             /******************* */
@@ -549,12 +595,17 @@ export class Win extends Component<any> {
         }
         //用这个数组去存取第三页面添加的全部用户属性
         this.adddrainfos=[];
+        this.dataInitInfos=[];
     }
 
 
     // 传入第三页面获取做出改变的数据
-    addDrainfo = (result: Array<any>) => {
-        this.adddrainfos.push(...result)
+    addDraInfo = (result: Array<any>) => {
+        this.adddrainfos = result
+    }
+
+    dataInitInfo = (result: Array<any>) => {
+        this.dataInitInfos = result
     }
 
     // props里应该也有一个change的函数提供，但是那个函数只能取值，所有的值约束，改变什么的都应该由本函数返回的函数实现。
@@ -697,7 +748,7 @@ export class Win extends Component<any> {
         const mains = [
             <TimeInit />,
             <BaseInfo info={this.state.baseinfo} />,
-            <Adddrawer getresult={this.addDrainfo} adddrainfo={this.state.adddrainfo}/>
+            <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>
         ]
 
         // TODO 将来完成后需要改，路由逻辑上要优化
@@ -708,8 +759,8 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
-                <Adddrawer getresult={this.addDrainfo} adddrainfo={this.state.adddrainfo}/>
-                <DataInit dataInitInfo={this.state.dataInitInfo} />
+                <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>
+                <DataInit getresult={this.dataInitInfo} dataInitInfo={this.state.dataInitInfo} />
                 <Buttons bsets={this.state.bsets}/>
             </Container>
         )
