@@ -123,7 +123,6 @@ export class BaseInfo extends Component<any> {
     }
 }
 
-// FLOW 因为props类型难以确定所以用any代替
 type Props = any;
 
 // TODO 第三个页面 第三页面在按下一步的时候应该需要让其修改管理密码和密保
@@ -198,8 +197,13 @@ export class Adddrawer extends Component<Props> {
             })
             state.jsonData = JSON.stringify(jsonData)
             this.setState(state)
+            this.props.getresult(this.increase)
         }
     }
+
+    // componentDidMount() {
+    //     this.props.getresult(this.increase)
+    // }
 
     render() {
         let modalClose = () => this.setState({ modalShow: false } );
@@ -430,8 +434,13 @@ class DataInit extends Component<Props> {
             })
             state.jsonData = JSON.stringify(jsonData)
             this.setState(state)
+            this.props.getresult(this.increase)
         }
     }
+
+    // componentDidMount() {
+    //     this.props.getresult(this.increase)
+    // }
 
 
     render() {
@@ -479,6 +488,29 @@ class MyForm extends Component<Props> {
         )
     }
 }
+
+
+// TODO 第五个页面
+// 开票限额可以不写在初始化里
+// class OpeningLimit extends Component<Props> {
+//     tableHead: Array<string>
+
+//     constructor(props: Props) {
+//         super(props)
+        
+//         this.tableHead = ["发票种类", "开票限额"]
+//     }
+
+
+//     render() {
+
+//         return (
+//             <div>
+                
+//             </div>
+//         )
+//     }
+// }
 
 
 
@@ -602,6 +634,9 @@ export class Win extends Component<any> {
     // 传入第三页面获取做出改变的数据
     addDraInfo = (result: Array<any>) => {
         this.adddrainfos = result
+        let state = this.state
+        state.bsets[0].disabled = result.length===0 ? true : false
+        this.setState(state)
     }
 
     dataInitInfo = (result: Array<any>) => {
@@ -716,7 +751,8 @@ export class Win extends Component<any> {
             // ps: 在写解决方案的时候发现优化方法 在setState之前就已经在本地拿到state.baseinfo了，直接做判定
             // THINK 为什么我没将bset重新setState也能成 ？：？：？：那是因为我拿到的是引用不是内存复制，其实就是对state中bsets数组 ： by solomon
             info.taxpayerName && info.taxpayerID && (bsets[0].disabled = (!info.taxpayerName.value || !info.taxpayerID.value) || (info.taxpayerName.tip || info.taxpayerID.tip) ? true : false)
-
+            // 如果没有增加东西的话就让按钮不可用  ps因为是模态框里的东西，其实这一部分应该交给模态框的确定按钮
+            // bsets[0].disabled = this.adddrainfos.length ? true : false
             // console.log(this.state)
 
             this.setState(this.state)
@@ -724,7 +760,7 @@ export class Win extends Component<any> {
         } 
     }
 
-    handerClick1 = () => {
+    handerClick1 = () => { 
         // TODO 
         console.log("this is handerClick1")
     }
@@ -740,6 +776,8 @@ export class Win extends Component<any> {
         let mainCounter = this.state.mainCounter
         let bsets = this.state.bsets;
         bsets[0].disabled = true;
+        // 第四个页面不需要按钮disable的
+        mainCounter+1===3 && (bsets[0]={value: "complete", disabled: false})
         const state = Object.assign({}, this.state, {mainCounter:mainCounter+1, bsets: bsets})
         this.setState(state)
     }
@@ -748,7 +786,8 @@ export class Win extends Component<any> {
         const mains = [
             <TimeInit />,
             <BaseInfo info={this.state.baseinfo} />,
-            <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>
+            <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>,
+            <DataInit getresult={this.dataInitInfo} dataInitInfo={this.state.dataInitInfo} />
         ]
 
         // TODO 将来完成后需要改，路由逻辑上要优化
@@ -759,8 +798,8 @@ export class Win extends Component<any> {
                 {main}
                 {/* <BaseInfo info={this.state.baseinfo} /> */}
                 {/* {this.state.buttons} */}
-                <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>
-                <DataInit getresult={this.dataInitInfo} dataInitInfo={this.state.dataInitInfo} />
+                {/* <Adddrawer getresult={this.addDraInfo} adddrainfo={this.state.adddrainfo}/>
+                <DataInit getresult={this.dataInitInfo} dataInitInfo={this.state.dataInitInfo} /> */}
                 <Buttons bsets={this.state.bsets}/>
             </Container>
         )
