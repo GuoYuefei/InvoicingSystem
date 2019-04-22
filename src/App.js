@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import './App.css';
 import {Win} from './Initialization/init.js'
 import {Test} from './Initialization/test'
+import {NavMain} from './mainWin/nav'
 
 
 class App extends Component {
@@ -17,6 +18,7 @@ class App extends Component {
         />
         <Win/>
         <Test />
+        <NavMain />
       </div>
     );
   }
