@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import { Row, Col, Dropdown } from 'react-bootstrap';
-import NavbarToggle from 'react-bootstrap/NavbarToggle';
+// import NavbarToggle from 'react-bootstrap/NavbarToggle';
 // import {} from 'react-bootstrap/Nav'
 
 export class NavMain extends Component<any> {

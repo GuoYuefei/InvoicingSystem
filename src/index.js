@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
 import * as serviceWorker from './serviceWorker';
-import {MainWin} from './mainWin/mianWin'
+import {MainWin} from './mainWin/mainWin'
 
 ReactDOM.render(<MainWin />, document.getElementById('root'));
 
