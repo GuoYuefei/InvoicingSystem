@@ -11,7 +11,6 @@ export class MainWin extends Component<any> {
     navDataSource: TypeNavDataSource
     buttonDataSource: TypeButtionDataSource
 
-
     constructor(props:any) {
         super(props)
        
@@ -72,7 +71,7 @@ export class MainWin extends Component<any> {
                     </Col>
                 </Row>
                 <div style={{padding:12}} />
-                <Row gutter={8}>
+                <Row gutter={64}>
                     <Col span={3}>
                         <Navantd dataSource={this.navDataSource} />
                     </Col>

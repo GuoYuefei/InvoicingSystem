@@ -1,34 +1,39 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "antd": "^3.16.5",
-    "bootstrap": "^4.3.1",
-    "flow-bin": "^0.95.1",
-    "jquery": "^3.3.1",
-    "react": "^16.8.4",
-    "react-bootstrap": "^1.0.0-beta.6",
-    "react-dom": "^16.8.4",
-    "react-scripts": "2.1.8"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "lint": "eslint --ext .js src test",
+    "precommit": "npm run lint",
     "flow": "flow"
+  },
+  "dependencies": {
+    "@babel/core": "^7.4.3",
+    "antd": "^3.16.5",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-import": "^1.11.0",
+    "dva": "^2.4.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "^3.0.0"
+  },
+  "devDependencies": {
+    "babel-plugin-dva-hmr": "^0.3.2",
+    "flow-bin": "^0.97.0"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "devDependencies": {
-    "flow-bin": "^0.95.1"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

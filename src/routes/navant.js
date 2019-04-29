@@ -27,24 +27,12 @@ export class Navantd extends Component<Props> {
   }
 
 
-  /**
-   * 
-   * this.props.dataSource: 
-   * Array<{
-   *    icon:string,
-   *    name:string,
-   *    items: Array<{
-   *      icon?:string, // 默认无
-   *      name:string,
-   *    }>
-   * }>
-   * 
-   */
+ 
   render() {
     return (
       <Menu
         onClick={this.handleClick}
-        style={{ width: 256,  height: '100%', minHeight: '100vh'}}
+        style={{ height: '100%', minHeight: '91vh'}}
         inlineCollapsed={false}
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
