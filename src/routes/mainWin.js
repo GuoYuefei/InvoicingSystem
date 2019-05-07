@@ -3,6 +3,7 @@ import React, {Component} from 'react'
 import {Navantd} from './navant'
 import { Row, Col } from 'antd';
 import { Buttons } from './buttons';
+import { ContentIndex } from './contents/index'
 import type {dataSource as TypeNavDataSource} from './navant'
 import type {dataSource as TypeButtionDataSource} from './buttons'
 
@@ -58,25 +59,22 @@ export class MainWin extends Component<any> {
     render() {
         return (
             <div>
-                <div style={{padding:6}}/>
-                <Row type="flex" justify="center">
+                <Row type="flex" justify="center" style={{paddingTop:8}}>
                     <Col>
                         <span>eTax@SH 电脑开票-上海市统一票样开票系统</span>
                     </Col>
                 </Row>
-                <div style={{padding:6}}/>
-                <Row>
+                <Row style={{paddingTop: 8}}>
                     <Col>
                         <Buttons dataSource={this.buttonDataSource} />
                     </Col>
                 </Row>
-                <div style={{padding:12}} />
-                <Row gutter={64}>
-                    <Col span={3}>
+                <Row gutter={64} style={{paddingTop: 24}} >
+                    <Col xxl={3} xl={4} lg={6} md={7} sm={8} xm={11}>
                         <Navantd dataSource={this.navDataSource} />
                     </Col>
-                    <Col>
-                        content
+                    <Col xxl={20} xl={19} lg={17} md={16} sm={15} xm={12}>
+                        <ContentIndex/>
                     </Col>
                 </Row>
             </div>
