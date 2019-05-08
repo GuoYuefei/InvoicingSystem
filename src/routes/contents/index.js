@@ -50,6 +50,9 @@ class ContentIndex extends Component<Props, State> {
         test.then(data=>{
             let state = this.state
             state.today = data.data
+            state.thisMonth = data.data
+            state.lastMonth = data.data
+            state.last3Month = data.data
             this.setState(state)
             console.log(state)
         })
@@ -62,7 +65,7 @@ class ContentIndex extends Component<Props, State> {
     render() {
 
         // FLOW 这种写法可以继承类型，无需重复声明静态类型
-        const {today} = this.state
+        const {today,thisMonth, lastMonth, last3Month} = this.state
 
         return (
             <div >
@@ -114,43 +117,32 @@ class ContentIndex extends Component<Props, State> {
                 <Row  type='flex' justify='space-between'>
                     <Col >
                         <Row style={{padding: 8}}>
-                            <Col><span>当日</span></Col>
+                            <Row><span>当日</span></Row>
                             <DividingLine/>
-                            <Col><span>正常分数：</span>{today.score||''}</Col>
-                            <Col><span>正常票金额：</span>{today.amount||0}</Col>
-                            <Col><span>废票份额：</span>{today.invalidatedTicket||0}</Col>
-                            <Col><span>退票份额：</span>{today.refund||0}</Col>
-                            <Col><span>退票金额：</span>{today.refundAmount||0}</Col>
+                            {/* <Row><span>正常分数：</span>{today.score||''}</Row>
+                            <Row><span>正常票金额：</span>{today.amount||0}</Row>
+                            <Row><span>废票份额：</span>{today.invalidatedTicket||0}</Row>
+                            <Row><span>退票份额：</span>{today.refund||0}</Row>
+                            <Row><span>退票金额：</span>{today.refundAmount||0}</Row> */}
+                            <TotalData {...today}/>
                         </Row>
                         <Row style={{padding: 8}}>
-                            <Col><span>当月</span></Col>
+                            <Row><span>当月</span></Row>
                             <DividingLine/>
-                            <Col><span>正常分数：</span>50</Col>
-                            <Col><span>正常票金额：</span>789456.32</Col>
-                            <Col><span>废票份额：</span>2</Col>
-                            <Col><span>退票份额：</span>2</Col>
-                            <Col><span>退票金额：</span>-123456.78</Col>
+                            <TotalData {...thisMonth} />
                         </Row>
                     </Col>
 
                     <Col >
                         <Row style={{padding: 8}}>
-                            <Col><span>上月</span></Col>
+                            <Row><span>上月</span></Row>
                             <DividingLine/>
-                            <Col><span>正常分数：</span>50</Col>
-                            <Col><span>正常票金额：</span>789456.32</Col>
-                            <Col><span>废票份额：</span>2</Col>
-                            <Col><span>退票份额：</span>2</Col>
-                            <Col><span>退票金额：</span>-123456.78</Col>
+                            <TotalData {...lastMonth} />
                         </Row>
                         <Row style={{padding: 8}}>
-                            <Col><span>三个月内</span></Col>
+                            <Row><span>三个月内</span></Row>
                             <DividingLine/>
-                            <Col><span>正常分数：</span>50</Col>
-                            <Col><span>正常票金额：</span>789456.32</Col>
-                            <Col><span>废票份额：</span>2</Col>
-                            <Col><span>退票份额：</span>2</Col>
-                            <Col><span>退票金额：</span>-123456.78</Col>
+                            <TotalData {...last3Month} />
                         </Row>
                     </Col>
                     
@@ -158,9 +150,9 @@ class ContentIndex extends Component<Props, State> {
                         <span>开票向导</span>
                         <DividingLine/>
                         <Row>
-                            <Col>第1步：<a href="#">接收税务机关数据</a> 或 <a href="#">发票购票录入 </a></Col>
-                            <Col>第2步：<a href="#">发票簿校验加锁</a></Col>
-                            <Col>第3步：<a href="#">开票</a></Col>
+                            <Row>第1步：<a href="#">接收税务机关数据</a> 或 <a href="#">发票购票录入 </a></Row>
+                            <Row>第2步：<a href="#">发票簿校验加锁</a></Row>
+                            <Row>第3步：<a href="#">开票</a></Row>
                         </Row>
                     </Col>
                 </Row>
@@ -171,6 +163,17 @@ class ContentIndex extends Component<Props, State> {
             </div>
         )
     }
+}
+
+function TotalData(props) {
+    let data:any = Object.values(props)
+    let titles: Array<string> = ["正常分数：", "正常票金额：", "废票份额：", "退票份额：", "退票金额："]
+
+    return (
+
+        data.map((value, index) => (
+            <Row key={index}><span>{titles[index]}</span>{value}</Row>))
+    )
 }
 
 
