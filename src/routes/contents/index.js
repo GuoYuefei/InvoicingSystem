@@ -3,18 +3,67 @@ import React, { Component } from "react";
 import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";
 import moment from 'moment';
+import {Today} from './today'
+import request from '../../utils/request';
+
 
 // type Props = {
 //     dataSource: any
 // }
-type Props = {}
+type Props = {
+    
+}
 
-export class ContentIndex extends Component<Props> {
+type TotalDataType = {
+    score: string,
+    amount: number,
+    invalidatedTicket: number,
+    refund: number,
+    refundAmount: number,
+}
 
+type State = {
+    today: TotalDataType,
+    thisMonth: TotalDataType,
+    lastMonth: TotalDataType,
+    last3Month: TotalDataType,
+}
+
+class ContentIndex extends Component<Props, State> {
+
+    setState: Function
+
+    constructor(props: Props) {
+        super(props)
+        this.state = {
+            today: {},
+            thisMonth: {},
+            lastMonth: {},
+            last3Month: {},
+        }
+    }
+
+    componentDidMount() {
+
+        // fetch
+        let test = request("http://127.0.0.1:8080/today/test")
+        test.then(data=>{
+            let state = this.state
+            state.today = data.data
+            this.setState(state)
+            console.log(state)
+        })
+        
+
+    }
 
 
 
     render() {
+
+        // FLOW 这种写法可以继承类型，无需重复声明静态类型
+        const {today} = this.state
+
         return (
             <div >
                 <Row style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-end'}}>
@@ -67,11 +116,11 @@ export class ContentIndex extends Component<Props> {
                         <Row style={{padding: 8}}>
                             <Col><span>当日</span></Col>
                             <DividingLine/>
-                            <Col><span>正常分数：</span>50</Col>
-                            <Col><span>正常票金额：</span>789456.32</Col>
-                            <Col><span>废票份额：</span>2</Col>
-                            <Col><span>退票份额：</span>2</Col>
-                            <Col><span>退票金额：</span>-123456.78</Col>
+                            <Col><span>正常分数：</span>{today.score||''}</Col>
+                            <Col><span>正常票金额：</span>{today.amount||0}</Col>
+                            <Col><span>废票份额：</span>{today.invalidatedTicket||0}</Col>
+                            <Col><span>退票份额：</span>{today.refund||0}</Col>
+                            <Col><span>退票金额：</span>{today.refundAmount||0}</Col>
                         </Row>
                         <Row style={{padding: 8}}>
                             <Col><span>当月</span></Col>
@@ -134,3 +183,6 @@ function DividingLine(props: {marginTop?: string, marginBottom?: string}) {
     )
     
 }
+
+
+export  {ContentIndex, Today}

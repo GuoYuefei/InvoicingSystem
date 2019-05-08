@@ -3,17 +3,24 @@ import React, {Component} from 'react'
 import {Navantd} from './navant'
 import { Row, Col } from 'antd';
 import { Buttons } from './buttons';
-import { ContentIndex } from './contents/index'
+import { ContentIndex, Today } from './contents/index'
 import type {dataSource as TypeNavDataSource} from './navant'
 import type {dataSource as TypeButtionDataSource} from './buttons'
+import { Router, Route, Switch } from 'dva/router';
+
 
 export class MainWin extends Component<any> {
 
     navDataSource: TypeNavDataSource
     buttonDataSource: TypeButtionDataSource
+    state: any
 
     constructor(props:any) {
         super(props)
+
+        this.state = {
+            indexData: {}
+        }
        
         // TODO 所有逻辑功能写在这里
         this.buttonDataSource = [
@@ -29,7 +36,7 @@ export class MainWin extends Component<any> {
 
         this.navDataSource = [
             {name: "开票统计", icon: "pie-chart", items: [
-                {name: "当日开票", icon: ""},
+                {name: "当日开票", icon: "", link: "today"},
                 {name: "本月开票", icon: ""},
                 {name: "上月开票", icon: ""},
                 {name: "三个月内开票", icon: ""},
@@ -56,7 +63,14 @@ export class MainWin extends Component<any> {
         ]
     }
 
+
+    
+
     render() {
+
+
+        
+
         return (
             <div>
                 <Row type="flex" justify="center" style={{paddingTop:8}}>
@@ -74,7 +88,13 @@ export class MainWin extends Component<any> {
                         <Navantd dataSource={this.navDataSource} />
                     </Col>
                     <Col xxl={20} xl={19} lg={17} md={16} sm={15} xm={12}>
-                        <ContentIndex/>
+                        <Router history={this.props.history}>
+                            <Switch>
+                                <Route path="/" exact component={ContentIndex} />
+                                <Route path="/today" exact component={Today} />
+                            </Switch>
+                        </Router>
+                        {/* <ContentIndex/> */}
                     </Col>
                 </Row>
             </div>

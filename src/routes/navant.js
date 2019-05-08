@@ -2,6 +2,7 @@
 import React, { Component } from "react";
 import 'antd/dist/antd.css';
 import { Menu, Icon } from "antd";
+import { Link } from "dva/router";
 
 const SubMenu = Menu.SubMenu;
 
@@ -11,6 +12,7 @@ export type dataSource = Array<{
   items: Array<{
     icon?:string, // 默认无
     name:string,
+    link?: string,
   }>
 }>
 
@@ -48,7 +50,7 @@ export class Navantd extends Component<Props> {
             <SubMenu key={index} title={<span><Icon type={value.icon} /><span>{value.name}</span></span>}>
               {
                 value.items.map((value, index, arr) => (
-                  <Menu.Item key={index}>{value.icon&&<Icon type={value.icon} />}{value.name}</Menu.Item>
+                  <Menu.Item key={index}>{value.icon&&<Icon type={value.icon} />}<Link to={value.link||'/'}>{value.name}</Link></Menu.Item>
                 ))
               }
             </SubMenu>

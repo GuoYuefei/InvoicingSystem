@@ -2,7 +2,6 @@
 import React, {Component} from 'react'
 import { Row, Col, Radio, Table } from 'antd';
 import RadioGroup from 'antd/lib/radio/group';
-import { any } from 'prop-types';
 import moment from 'moment';
 
 type FrameProps = {
@@ -42,6 +41,8 @@ export class Today extends Component<TodayProps> {
                     {value: '4', name: '退票'}
                 ]
             },
+            infoTotal: <span>暂时</span>,
+            infoView: <TodayTable />,
         }
     }
 
@@ -51,7 +52,7 @@ export class Today extends Component<TodayProps> {
     render () {
         return (
             <div>
-                
+                <Frame {...this.info} />
             </div>
         )
     }
@@ -148,15 +149,17 @@ class Frame extends Component<FrameProps> {
                         </RadioGroup>
                     </Col>
                 </Row>
-                // TODO 下面两个感觉可以合成一个。还有上面一个也会和数据相关，看情况合并
+                {
+                    // TODO 下面两个感觉可以合成一个。还有上面一个也会和数据相关，看情况合并
+                }
                 <Row>
                     <Col>
-                        <Infomation />
+                        {Infomation}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        <View />
+                        {View}
                     </Col>
                 </Row>
             </Row>
