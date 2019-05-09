@@ -1,18 +1,16 @@
 // @flow
-import React, { Component } from "react";
+import React from "react";
 import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";
 import moment from 'moment';
 import {Today} from './today'
-import request from '../../utils/request';
+import { connect } from "dva";
 
 
 // type Props = {
 //     dataSource: any
 // }
-type Props = {
-    
-}
+// type Props = any
 
 type TotalDataType = {
     score: string,
@@ -22,51 +20,44 @@ type TotalDataType = {
     refundAmount: number,
 }
 
-type State = {
+// THINK 这个不是实际类型，只让flow检查我们使用的数据， dva传入了其他东西，这些东西也和使用的钩子有关
+type Props = {
+    dispatch: Function,
     today: TotalDataType,
     thisMonth: TotalDataType,
     lastMonth: TotalDataType,
     last3Month: TotalDataType,
 }
 
-class ContentIndex extends Component<Props, State> {
+class ContentIndex extends React.Component<Props> {
 
-    setState: Function
-
+    dispatch: Function
     constructor(props: Props) {
         super(props)
-        this.state = {
-            today: {},
-            thisMonth: {},
-            lastMonth: {},
-            last3Month: {},
-        }
+        // console.log("props:.......")
+        // console.log(this.props)
+        this.dispatch = this.props.dispatch
     }
 
     componentDidMount() {
-
-        // fetch
-        let test = request("http://127.0.0.1:8080/today/test")
-        test.then(data=>{
-            let state = this.state
-            state.today = data.data
-            state.thisMonth = data.data
-            state.lastMonth = data.data
-            state.last3Month = data.data
-            this.setState(state)
-            console.log(state)
-        })
-        
+        // 这种写法**不会**导致父组件state改变重新刷新，然后又调用这个方法，循环不止
+        this.dispatch({
+            type: "contentIndex/fetchData",
+            updateTotal: {}
+        })   
 
     }
 
-
+    // componentDidUpdate() {
+    //     // THINK 到现在props中才有我们要的数据
+    //     console.log(this.props)
+    // }
 
     render() {
-
+        
         // FLOW 这种写法可以继承类型，无需重复声明静态类型
-        const {today,thisMonth, lastMonth, last3Month} = this.state
-
+        const {today,thisMonth, lastMonth, last3Month} = this.props
+    
         return (
             <div >
                 <Row style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-end'}}>
@@ -76,7 +67,7 @@ class ContentIndex extends Component<Props, State> {
                     </Col>
                     
                     <Col span={12} >
-
+    
                         <Row >
                             <Col>张三</Col>
                             <Col>
@@ -89,7 +80,7 @@ class ContentIndex extends Component<Props, State> {
                     </Col>
                     
                     <Col span={6} >
-
+    
                         <Row>
                             <Col>电脑日期：{moment().format('YYYY-MM-DD')}</Col>
                             <Col>电脑时间：{moment().format('HH:mm:ss')}</Col>
@@ -99,11 +90,11 @@ class ContentIndex extends Component<Props, State> {
                 </Row>
                 
                 <DividingLine marginTop='5px' marginBottom="10px"/>
-
+    
                 <Row>
                     <Col><span>当前月度：<span style={{ fontSize: 18, fontWeight: 'bold' }}>{moment().format('YYYY年MM月')}</span></span></Col>
                 </Row>
-
+    
                 {
                 /**
                     +-----+------+---------+
@@ -113,7 +104,7 @@ class ContentIndex extends Component<Props, State> {
                     +-----+------+---------+
                  */
                 }
-
+    
                 <Row  type='flex' justify='space-between'>
                     <Col >
                         <Row style={{padding: 8}}>
@@ -132,7 +123,7 @@ class ContentIndex extends Component<Props, State> {
                             <TotalData {...thisMonth} />
                         </Row>
                     </Col>
-
+    
                     <Col >
                         <Row style={{padding: 8}}>
                             <Row><span>上月</span></Row>
@@ -159,19 +150,20 @@ class ContentIndex extends Component<Props, State> {
        
                 
                 
-
+    
             </div>
         )
     }
+
 }
 
 function TotalData(props) {
-    let data:any = Object.values(props)
+    let data: Array<any> = Object.values(props)
     let titles: Array<string> = ["正常分数：", "正常票金额：", "废票份额：", "退票份额：", "退票金额："]
 
     return (
 
-        data.map((value, index) => (
+        data.map((value: string|number, index) => (
             <Row key={index}><span>{titles[index]}</span>{value}</Row>))
     )
 }
@@ -186,6 +178,14 @@ function DividingLine(props: {marginTop?: string, marginBottom?: string}) {
     )
     
 }
+// let Index: Function = 
+export default connect(state=>{
+    // console.log("!!!!")
+    // console.log(state.contentIndex.updateTotal)
+    return state.contentIndex.updateTotal
+})(ContentIndex)
 
-
-export  {ContentIndex, Today}
+export  {
+    
+    Today
+}

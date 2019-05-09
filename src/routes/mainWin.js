@@ -3,19 +3,20 @@ import React, {Component} from 'react'
 import {Navantd} from './navant'
 import { Row, Col } from 'antd';
 import { Buttons } from './buttons';
-import { ContentIndex, Today } from './contents/index'
+import ContentIndex, { Today } from './contents/index'
 import type {dataSource as TypeNavDataSource} from './navant'
 import type {dataSource as TypeButtionDataSource} from './buttons'
 import { Router, Route, Switch } from 'dva/router';
 
+type Props = {history?: History}
 
-export class MainWin extends Component<any> {
+export class MainWin extends Component<Props> {
 
     navDataSource: TypeNavDataSource
     buttonDataSource: TypeButtionDataSource
     state: any
 
-    constructor(props:any) {
+    constructor(props: Props) {
         super(props)
 
         this.state = {
@@ -64,11 +65,7 @@ export class MainWin extends Component<any> {
     }
 
 
-    
-
     render() {
-
-
         
 
         return (

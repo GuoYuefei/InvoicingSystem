@@ -5,24 +5,24 @@ import RadioGroup from 'antd/lib/radio/group';
 import moment from 'moment';
 
 type FrameProps = {
-    title: String,
+    title: string,
     control: {
         onChange: Function,
         value: string,
         content: Array<{value: string, name: string}>
     },
-    infoTotal: any,
-    infoView: any
+    infoTotal: React$Element<any>,
+    infoView: React$Element<any>,
 }
 
-type TodayProps = any
+type TodayProps = {}
 
-type TodayTableProps = any
+type TodayTableProps = {}
 
 
 export class Today extends Component<TodayProps> {
     state: any
-    info: any
+    info: FrameProps
 
     constructor(props: TodayProps) {
         super(props)
@@ -131,8 +131,8 @@ class Frame extends Component<FrameProps> {
 
 
     render() {
-        let Infomation: any = this.props.infoTotal
-        let View: any = this.props.infoView
+        let Infomation: React$Element<any> = this.props.infoTotal
+        let View: React$Element<any> = this.props.infoView
         return (
             <Row>
                 <Row>

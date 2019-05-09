@@ -22,7 +22,7 @@ export class Buttons extends Component<Props> {
                         
                         {
                             this.props.dataSource.map((value, index, arr) => (
-                                <Col>
+                                <Col key={index}>
                                     <Button icon={value.icon}>{value.name}</Button>
                                 </Col>
                             ))
