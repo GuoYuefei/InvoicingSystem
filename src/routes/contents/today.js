@@ -6,7 +6,7 @@ import moment from 'moment';
 
 type FrameProps = {
     title: string,
-    control: {
+    control?: {
         onChange: Function,
         value: string,
         content: Array<{value: string, name: string}>
@@ -138,9 +138,12 @@ class Frame extends Component<FrameProps> {
                 <Row>
                     <Col style={{ fontSize: '25px', fontWeight: 'bold' }}>{this.props.title}</Col>
                 </Row>
+                {
+                    //TODO  这个要改
+                this.props.control &&
                 <Row>
                     <Col>
-                        <RadioGroup onChnage={this.props.control.onChange} value={this.props.control.value}>
+                        <RadioGroup onChnage={this.props.control&&this.props.control.onChange} value={this.props.control&&this.props.control.value}>
                             {
                                 this.props.control.content.map((value, index, arr)=>(
                                     <Radio value={value.value} key={index}>{value.name}</Radio>
@@ -149,6 +152,8 @@ class Frame extends Component<FrameProps> {
                         </RadioGroup>
                     </Col>
                 </Row>
+                }
+                
                 {
                     // TODO 下面两个感觉可以合成一个。还有上面一个也会和数据相关，看情况合并
                 }

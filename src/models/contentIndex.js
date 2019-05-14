@@ -1,4 +1,4 @@
-/**  */
+/** @flow  */
 
 import { getTotalData } from "../services/get/contentIndex";
 
@@ -10,7 +10,15 @@ import { getTotalData } from "../services/get/contentIndex";
 //     refundAmount: number,
 // }
 
-let contentIndex: any = {
+type ModelType = {
+    namespace: string,
+    state: any,
+    effects: Object,
+    reducers: Object,
+    subscriptions?: Object,
+}
+
+let contentIndex: ModelType = {
     namespace: 'contentIndex',
 
     state: {
@@ -25,15 +33,16 @@ let contentIndex: any = {
             // console.log("I'm run")
             const {data} = yield call(getTotalData)
             yield put({
-                type: 'updateTotalDataAll',
-                updateTotal: data
+                type: 'updateTotalDataAll',             // THINK reducers中方法
+                updateTotal: data                       // THINK 方法中携带的信息
             })
             
         }
     },
 
     reducers: {
-        updateTotalDataAll(state, {updateTotal}) {
+        updateTotalDataAll(state, {updateTotal}) {          // THINK updateTotal是effects中put的除type之外的属性内容
+            delete updateTotal.id
             let result: any = {
                 ...state,
                 updateTotal: {

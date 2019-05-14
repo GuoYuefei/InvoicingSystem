@@ -3,7 +3,8 @@ import React from "react";
 import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";
 import moment from 'moment';
-import {Today} from './today'
+import { Today } from './today'
+import { TicketRecord } from './ticketRecord'
 import { connect } from "dva";
 
 
@@ -40,10 +41,10 @@ class ContentIndex extends React.Component<Props> {
     }
 
     componentDidMount() {
-        // 这种写法**不会**导致父组件state改变重新刷新，然后又调用这个方法，循环不止
+        // THINK 这种写法**不会**导致父组件state改变重新刷新，然后又调用这个方法，循环不止
         this.dispatch({
-            type: "contentIndex/fetchData",
-            updateTotal: {}
+            type: "contentIndex/fetchData",             // contentIndex是自己写的Model并注册到dva中，fetchData是effects中的方法
+            updateTotal: {}          //没用可有可无，要传则传
         })   
 
     }
@@ -179,13 +180,10 @@ function DividingLine(props: {marginTop?: string, marginBottom?: string}) {
     
 }
 // let Index: Function = 
-export default connect(state=>{
-    // console.log("!!!!")
-    // console.log(state.contentIndex.updateTotal)
-    return state.contentIndex.updateTotal
-})(ContentIndex)
+export default connect(state=>state.contentIndex.updateTotal)(ContentIndex)
 
 export  {
     
-    Today
+    Today,
+    TicketRecord
 }

@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import {Navantd} from './navant'
 import { Row, Col } from 'antd';
 import { Buttons } from './buttons';
-import ContentIndex, { Today } from './contents/index'
+import ContentIndex, { Today, TicketRecord } from './contents/index'
 import type {dataSource as TypeNavDataSource} from './navant'
 import type {dataSource as TypeButtionDataSource} from './buttons'
 import { Router, Route, Switch } from 'dva/router';
@@ -35,6 +35,7 @@ export class MainWin extends Component<Props> {
             {name: "登陆", icon: "user"},
         ]
 
+        // 其中items中的icon和link可有可无
         this.navDataSource = [
             {name: "开票统计", icon: "pie-chart", items: [
                 {name: "当日开票", icon: "", link: "today"},
@@ -49,7 +50,7 @@ export class MainWin extends Component<Props> {
                 {name: "作废发票"},
             ]},
             {name: "购存统计", icon: "shopping", items: [
-                {name: "购票记录"},
+                {name: "购票记录", link: "ticketRecord"},
                 {name: "发票库存"},
             ]},
             {name: "其他统计", icon: "inbox", items: [
@@ -89,6 +90,7 @@ export class MainWin extends Component<Props> {
                             <Switch>
                                 <Route path="/" exact component={ContentIndex} />
                                 <Route path="/today" exact component={Today} />
+                                <Route path="/ticketRecord" exact component={TicketRecord} />
                             </Switch>
                         </Router>
                         {/* <ContentIndex/> */}

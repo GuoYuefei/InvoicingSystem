@@ -40,9 +40,11 @@ export class Navantd extends Component<Props> {
         defaultOpenKeys={['sub1']}
         mode="inline"
       >
-        <Menu.Item>
+          
+        <Menu.Item >
           <Icon type="bank" />
-          首页
+          <span><Link to={'/'}>首页</Link></span>
+          
         </Menu.Item>
         
         {
@@ -50,7 +52,7 @@ export class Navantd extends Component<Props> {
             <SubMenu key={index} title={<span><Icon type={value.icon} /><span>{value.name}</span></span>}>
               {
                 value.items.map((value, index, arr) => (
-                  <Menu.Item key={index}>{value.icon&&<Icon type={value.icon} />}<Link to={value.link||'/'}>{value.name}</Link></Menu.Item>
+                  <Menu.Item key={index}> { value.icon&&<Icon type={value.icon} />} <Link to={value.link||'/'}> {value.name} </Link> </Menu.Item>
                 ))
               }
             </SubMenu>
