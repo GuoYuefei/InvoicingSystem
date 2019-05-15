@@ -4,16 +4,25 @@ import { Row, Col, Radio, Table } from 'antd';
 import RadioGroup from 'antd/lib/radio/group';
 import moment from 'moment';
 
-type FrameProps = {
-    title: string,
-    control?: {
-        onChange: Function,
-        value: string,
-        content: Array<{value: string, name: string}>
-    },
-    infoTotal: React$Element<any>,
-    infoView: React$Element<any>,
-}
+import { Frame } from '../../components/frame'
+
+import type { FrameProps } from '../../components/frame'
+
+
+
+// 这个类型其实可以从 Frame 所在文件导出
+// type FrameProps = {
+//     title: string,
+//     control?: {
+//         RadioGroup?: {
+//             onChange: Function,
+//             value: string,
+//             content: Array<{value: string, name: string}>
+//         }
+//     },
+//     infoTotal: React$Element<any>,
+//     infoView: React$Element<any>,
+// }
 
 type TodayProps = {}
 
@@ -32,21 +41,21 @@ export class Today extends Component<TodayProps> {
         this.info = {
             title: "当日开票",
             control: {
-                onChange: () => {},
-                value: "1",
-                content: [
-                    {value: '1', name: '全部'},
-                    {value: '2', name: '正常票'},
-                    {value: '3', name: '废票'},
-                    {value: '4', name: '退票'}
-                ]
+                RadioGroup:{
+                    onChange: () => {},
+                    value: "1",
+                    content: [
+                        {value: '1', name: '全部'},
+                        {value: '2', name: '正常票'},
+                        {value: '3', name: '废票'},
+                        {value: '4', name: '退票'}
+                    ]
+                }
             },
             infoTotal: <span>暂时</span>,
             infoView: <TodayTable />,
         }
     }
-
-
 
 
     render () {
@@ -63,7 +72,7 @@ class TodayTable extends Component<TodayTableProps> {
         columns: Array<{
             title:string, dataIndex: string, key: string
         }>,
-        dataSource: Array<{
+        dataSource?: Array<{
             key: string, 
             num: number, 
             invoiceCode: string,
@@ -116,58 +125,6 @@ class TodayTable extends Component<TodayTableProps> {
             <div>
                 <Table {...this.data} />
             </div>
-        )
-    }
-}
-
-
-
-
-
-
-class Frame extends Component<FrameProps> {
-
-
-
-
-    render() {
-        let Infomation: React$Element<any> = this.props.infoTotal
-        let View: React$Element<any> = this.props.infoView
-        return (
-            <Row>
-                <Row>
-                    <Col style={{ fontSize: '25px', fontWeight: 'bold' }}>{this.props.title}</Col>
-                </Row>
-                {
-                    //TODO  这个要改
-                this.props.control &&
-                <Row>
-                    <Col>
-                        <RadioGroup onChnage={this.props.control&&this.props.control.onChange} value={this.props.control&&this.props.control.value}>
-                            {
-                                this.props.control.content.map((value, index, arr)=>(
-                                    <Radio value={value.value} key={index}>{value.name}</Radio>
-                                ))
-                            }
-                        </RadioGroup>
-                    </Col>
-                </Row>
-                }
-                
-                {
-                    // TODO 下面两个感觉可以合成一个。还有上面一个也会和数据相关，看情况合并
-                }
-                <Row>
-                    <Col>
-                        {Infomation}
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        {View}
-                    </Col>
-                </Row>
-            </Row>
         )
     }
 }

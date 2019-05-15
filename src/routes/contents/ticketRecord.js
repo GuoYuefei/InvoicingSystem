@@ -6,10 +6,12 @@
  * @flow
  */
 import React, { Component } from 'react'
+import type { FrameProps } from '../../components/frame'
 
 import { Frame } from '../../components/frame';
+import moment from 'moment';
+import { Table } from 'antd';
 
-import type { FrameProps } from '../../components/frame'
 
 
 // type FrameProps = {
@@ -36,15 +38,13 @@ export class TicketRecord extends Component<Props> {
         this.info = {
             title: "购票记录",
             infoTotal:<div></div>,
-            infoView: <div></div>
+            infoView: <TiRcdTable />
         }
     }
-
 
     render() {
         return (
             <Frame {...this.info}/>
-
         )
     }
 }
@@ -52,6 +52,54 @@ export class TicketRecord extends Component<Props> {
 
 
 class TiRcdTable extends Component<TiRcdTableProps> {
+
+    data: {
+        columns: Array<{
+            title:string, dataIndex: string, key: string
+        }>,
+        data?: Array<{
+            key: string, 
+            ticketDate: string,
+            invoiceCode: string,
+            codeBegin: string,
+            codeEnd: string,
+            num: number,
+            state: string,
+
+        }>
+    }
+
+    constructor(props: TiRcdTableProps) {
+        super(props)
+        this.data = {
+            columns: [
+                {title: "购票日期", dataIndex: "ticketDate", key: "ticketDate"},
+                {title: "发票代码", dataIndex: "invoiceCode", key: "invoiceCode"},
+                {title: "开始号码", dataIndex: "codeBegin", key: "codeBegin"},
+                {title: "截至号码", dataIndex: "codeEnd", key: "codeEnd"},
+                {title: "份数", dataIndex: "num", key: "num"},
+                {title: "状态", dataIndex: "state", key: "state"}
+            ],
+            // TODO 将来来源api
+            dataSource: [
+                {
+                    key: "1",
+                    ticketDate: moment().format('YYYY-MM-DD'),
+                    invoiceCode: "12323123145",
+                    codeBegin: "100000",
+                    codeEnd: "100100",
+                    num: 100,
+                    state: "锁定"
+                }
+            ]
+        }
+    }
+
+    render() {
+        return (
+            <Table {...this.data} />
+        )
+    }
 
 }
 

@@ -8,13 +8,19 @@ import React, {Component} from 'react';
 import { Row, Col, Radio } from 'antd';
 import RadioGroup from 'antd/lib/radio/group';
 
+type CRGProps = {
+    onChange: Function,
+    value: string,
+    content: Array<{value: string, name: string}>
+}
 
 export type FrameProps = {
     title: string,
     control?: {
-        onChange: Function,
-        value: string,
-        content: Array<{value: string, name: string}>
+
+        RadioGroup?: CRGProps,
+
+        
     },
     infoTotal: React$Element<any>,
     infoView: React$Element<any>,
@@ -33,21 +39,12 @@ export class Frame extends Component<FrameProps> {
                 <Row>
                     <Col style={{ fontSize: '25px', fontWeight: 'bold' }}>{this.props.title}</Col>
                 </Row>
+
                 {
                     // 只有this.props.control有才渲染，bingo
                     this.props.control&&
-                    <Row>
-                        <Col>
-                            <RadioGroup onChnage={this.props.control&&this.props.control.onChange} value={this.props.control&&this.props.control.value} >
-                            {
-                                this.props.control.content.map((value, index, arr)=>(
-                                    <Radio value={value.value} key={index}>{value.name}</Radio>
-                                ))
-                            }
-                            </RadioGroup>
-                            
-                        </Col>
-                    </Row>
+                    this.props.control.RadioGroup&&
+                    <ControlRadioGroup {...this.props.control.RadioGroup} />
 
                 }
                 {
@@ -64,6 +61,28 @@ export class Frame extends Component<FrameProps> {
                     </Col>
                 </Row>
             </Row>
+        )
+    }
+}
+
+
+
+// TODO 这个可能会对table影响
+export class ControlRadioGroup extends Component<CRGProps> {
+
+    // constructor(props: CRGProps) {
+    //     super(props)
+    // }
+
+    render() {
+        return (
+            <RadioGroup onchange={this.props.onChange} value={this.props.value} >
+                {
+                    this.props.content.map((value, index, arr) => (
+                        <Radio value={value.value} key={index}>{value.name}</Radio>
+                    ))
+                }
+            </RadioGroup>
         )
     }
 }
