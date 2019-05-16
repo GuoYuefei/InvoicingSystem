@@ -1,4 +1,10 @@
-// @flow
+/**
+ * @author solomon
+ * @license MIT
+ * 
+ * @flow
+ */
+
 import React, {Component} from 'react'
 import {Navantd} from './navant'
 import { Row, Col } from 'antd';

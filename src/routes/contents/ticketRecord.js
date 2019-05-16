@@ -1,10 +1,16 @@
-/**
- * 购票记录也面 
+/** 
+ * @description 购票记录页面 
  * @author Solomon
  * @license MIT
  * 
- * @flow
+ * @Date 2019-05-15 19:20:02
+ * @LastEditors Solomon
+ * @LastEditTime 2019-05-15 19:20:02
+ * 
+ * @flow 
  */
+
+
 import React, { Component } from 'react'
 import type { FrameProps } from '../../components/frame'
 
@@ -14,16 +20,7 @@ import { Table } from 'antd';
 
 
 
-// type FrameProps = {
-//     title: string,
-//     control: {
-//         onChange: Function,
-//         value: string,
-//         content: Array<{value: string, name: string}>
-//     },
-//     infoTotal: React$Element<any>,
-//     infoView: React$Element<any>,
-// }
+
 
 type Props = {}
 
@@ -37,6 +34,20 @@ export class TicketRecord extends Component<Props> {
         super(props)
         this.info = {
             title: "购票记录",
+            controls: {
+
+                buttons: {
+                    order: 0,
+                    content: [
+                        {
+                            name: "增加购票记录",
+                            icon: "plus",
+                            // onClick: ()=>{},
+                        }
+                    ]
+                },
+                
+            },
             infoTotal:<div></div>,
             infoView: <TiRcdTable />
         }
@@ -100,6 +111,6 @@ class TiRcdTable extends Component<TiRcdTableProps> {
             <Table {...this.data} />
         )
     }
-
 }
+
 

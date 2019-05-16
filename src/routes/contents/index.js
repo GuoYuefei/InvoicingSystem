@@ -1,4 +1,9 @@
-// @flow
+/**
+ * @author solomon
+ * @license MIT
+ * 
+ * @flow
+ */
 import React from "react";
 import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";

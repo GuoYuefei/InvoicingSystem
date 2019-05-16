@@ -1,24 +1,34 @@
-/**
- * 展示页面的框架Component
- * @author solomon
- * @license MIT
- * @flow
+/** 
+ * @description 展示页面的整体框架 
+ * @author Solomon
+ * @license: MIT
+ * 
+ * @Date 2019-05-15 19:20:02
+ * @LastEditors Solomon
+ * @LastEditTime 2019-05-15 19:20:02
+ * 
+ * @flow 
  */
+
+
+
+ 
 import React, {Component} from 'react';
 import { Row, Col, Radio, Button } from 'antd';
 import RadioGroup from 'antd/lib/radio/group';
 
-type CRGProps = {
+export type CRGProps = {
     order?: number,
     onChange: (e: Event) => void,
     value: string,
     content: Array<{value: string, name: string}>
 }
 
-type CBProps = {
+export type CBProps = {
     // TODO 这是为了之后组件排序
     order?: number, 
-    content?: Array<{
+    // 这里我认为，该类型在嵌套的上级内容中出现CBProps类型，那么就应该存在Button需要渲染
+    content: Array<{
         name: string,
         type?: string,
         icon?: string,
@@ -29,7 +39,7 @@ type CBProps = {
     }>
 }
 
-type ControlProps = {
+export type ControlProps = {
     
     radioGroup?: CRGProps,
 
@@ -38,8 +48,8 @@ type ControlProps = {
 
 export type FrameProps = {
     title: string,
-    control?: ControlProps,
-    infoTotal: React$Element<any>,
+    controls?: ControlProps,
+    infoTotal?: React$Element<any>,
     infoView: React$Element<any>,
 }
 
@@ -48,7 +58,7 @@ export class Frame extends Component<FrameProps> {
 
 
     render() {
-        let Infomation: React$Element<any> = this.props.infoTotal
+        let Infomation: React$Element<any>|null = this.props.infoTotal ? this.props.infoTotal : null
         let View: React$Element<any> = this.props.infoView
         return (
             <Row>
@@ -58,8 +68,8 @@ export class Frame extends Component<FrameProps> {
 
                 {
                     // 这一部分彻底交给Controler管理
-                    this.props.control && 
-                    <Controler {...this.props.control} />
+                    this.props.controls && 
+                    <Controler {...this.props.controls} />
                 }
 
                 {
@@ -91,7 +101,7 @@ type controlsType = Array<controlItem>
 /**
  * TODO 一个复杂的逻辑
  * 如果各传入组件的props中有order属性，那么按order排序显示
- * 如果有的有，有的没有order属性，那么就
+ * 如果有的有，有的没有order属性，那么就没有的排最前面，其他按顺序排
  */
 class Controler extends Component<ControlProps> {
 
@@ -121,7 +131,7 @@ class Controler extends Component<ControlProps> {
 
     }
 
-
+    
     render() {
         return (
             <div>
@@ -135,7 +145,6 @@ class Controler extends Component<ControlProps> {
     }
 }
 
-// TODO 这个可能会对table影响
 export class ControlRadioGroup extends Component<CRGProps> {
 
     // constructor(props: CRGProps) {
@@ -168,11 +177,29 @@ export class ControlButtions extends Component<CBProps> {
         return (
             <div>
                 {
-                    this.props.content&&
                     this.props.content.map((v, i, a) => (
                         <Button {...v} key={i}>{v.name}</Button>
                     ))
                 }
+            </div>
+        )
+    }
+}
+
+// TODO 还需要一个下拉列表
+
+export type CSProps = {
+
+}
+
+export class ControlSelects extends Component<CSProps> {
+
+
+    
+    render() {
+        return (
+            <div>
+                
             </div>
         )
     }

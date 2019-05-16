@@ -1,4 +1,9 @@
-// @flow
+/**
+ * @author solomon
+ * @license MIT
+ * 
+ * @flow
+ */
 import React, {Component} from 'react'
 import { Table } from 'antd';
 import moment from 'moment';
@@ -39,7 +44,7 @@ export class Today extends Component<TodayProps> {
         }
         this.info = {
             title: "当日开票",
-            control: {
+            controls: {
                 radioGroup:{
                     onChange: () => {},
                     value: "1",
