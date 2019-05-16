@@ -1,7 +1,6 @@
 // @flow
 import React, {Component} from 'react'
-import { Row, Col, Radio, Table } from 'antd';
-import RadioGroup from 'antd/lib/radio/group';
+import { Table } from 'antd';
 import moment from 'moment';
 
 import { Frame } from '../../components/frame'
@@ -41,7 +40,7 @@ export class Today extends Component<TodayProps> {
         this.info = {
             title: "当日开票",
             control: {
-                RadioGroup:{
+                radioGroup:{
                     onChange: () => {},
                     value: "1",
                     content: [

@@ -72,8 +72,8 @@ class ContentIndex extends React.Component<Props> {
                         <Row >
                             <Col>张三</Col>
                             <Col>
-                                <a href="#"><span>更换头像</span></a>|
-                                <a href="#"><span>删除头像</span></a>
+                                <a href="/"><span>更换头像</span></a>|
+                                <a href="/"><span>删除头像</span></a>
                             </Col>
                             <Col>310103182727363</Col>
                             <Col>上海计算机有限公司</Col>
@@ -142,9 +142,9 @@ class ContentIndex extends React.Component<Props> {
                         <span>开票向导</span>
                         <DividingLine/>
                         <Row>
-                            <Row>第1步：<a href="#">接收税务机关数据</a> 或 <a href="#">发票购票录入 </a></Row>
-                            <Row>第2步：<a href="#">发票簿校验加锁</a></Row>
-                            <Row>第3步：<a href="#">开票</a></Row>
+                            <Row>第1步：<a href="/">接收税务机关数据</a> 或 <a href="/">发票购票录入 </a></Row>
+                            <Row>第2步：<a href="/">发票簿校验加锁</a></Row>
+                            <Row>第3步：<a href="/">开票</a></Row>
                         </Row>
                     </Col>
                 </Row>

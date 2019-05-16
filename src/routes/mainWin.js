@@ -82,10 +82,10 @@ export class MainWin extends Component<Props> {
                     </Col>
                 </Row>
                 <Row gutter={64} style={{paddingTop: 24}} >
-                    <Col xxl={3} xl={4} lg={6} md={7} sm={8} xm={11}>
+                    <Col xl={4} lg={6} md={7} sm={8} xm={8}>
                         <Navantd dataSource={this.navDataSource} />
                     </Col>
-                    <Col xxl={20} xl={19} lg={17} md={16} sm={15} xm={12}>
+                    <Col xl={20} lg={18} md={17} sm={16} xm={16}>
                         <Router history={this.props.history}>
                             <Switch>
                                 <Route path="/" exact component={ContentIndex} />
