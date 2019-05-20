@@ -1,17 +1,12 @@
-/** 
- * @description 展示页面的整体框架 
- * @author Solomon
- * @license: MIT
- * 
- * @Date 2019-05-15 19:20:02
- * @LastEditors Solomon
- * @LastEditTime 2019-05-15 19:20:02
- * 
- * @flow 
- */
-
-
-
+/**
+* @description 展示页面的整体框架 
+* @author Solomon
+* @license MIT
+* @created 2019-05-15T19:20:02 Z+08:00
+* @last_modified 2019-05-20T10:31:48 Z+08:00
+* 
+* @flow 
+*/
  
 import React, {Component} from 'react';
 import { Row, Col, Radio, Button } from 'antd';

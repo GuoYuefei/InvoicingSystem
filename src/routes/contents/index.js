@@ -1,9 +1,13 @@
 /**
- * @author solomon
- * @license MIT
- * 
- * @flow
- */
+* @description 展示页面的主页
+* @author Solomon
+* @license MIT
+* @created 2019-05-15T19:20:02 Z+08:00
+* @last_modified 2019-05-20T10:32:42 Z+08:00
+* 
+* @flow 
+*/
+
 import React from "react";
 import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";

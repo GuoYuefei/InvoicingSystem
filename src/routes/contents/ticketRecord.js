@@ -1,15 +1,12 @@
-/** 
- * @description 购票记录页面 
- * @author Solomon
- * @license MIT
- * 
- * @Date 2019-05-15 19:20:02
- * @LastEditors Solomon
- * @LastEditTime 2019-05-15 19:20:02
- * 
- * @flow 
- */
-
+/**
+* @description 购票记录页面 
+* @author Solomon
+* @license MIT
+* @created 2019-05-15T19:20:02 Z+08:00
+* @last_modified 2019-05-20T10:30:25 Z+08:00
+* 
+* @flow 
+*/
 
 import React, { Component } from 'react'
 import type { FrameProps } from '../../components/frame'

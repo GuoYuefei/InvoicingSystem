@@ -1,3 +1,13 @@
+/**
+* @description 
+* @author Solomon
+* @license MIT
+* @created 2019-04-29T11:40:56 Z+08:00
+* @last_modified 2019-05-20T10:31:08 Z+08:00
+* 
+* @flow 
+*/
+
 import dva from 'dva';
 // bug dva还未解决使用browserHistory的bug 需要依赖第三方
 // import { browserHistory } from 'dva/router'

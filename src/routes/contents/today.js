@@ -1,9 +1,13 @@
 /**
- * @author solomon
- * @license MIT
- * 
- * @flow
- */
+* @description 当日开票
+* @author Solomon
+* @license MIT
+* @created 2019-05-15T19:20:02 Z+08:00
+* @last_modified 2019-05-20T10:33:13 Z+08:00
+* 
+* @flow 
+*/
+
 import React, {Component} from 'react'
 import { Table } from 'antd';
 import moment from 'moment';

@@ -1,9 +1,12 @@
 /**
- * @author solomon
- * @license MIT
- * 
- * @flow
- */
+* @description 主要页面
+* @author Solomon
+* @license MIT
+* @created 2019-05-15T19:20:02 Z+08:00
+* @last_modified 2019-05-20T10:32:30 Z+08:00
+* 
+* @flow 
+*/
 
 import React, {Component} from 'react'
 import {Navantd} from './navant'
