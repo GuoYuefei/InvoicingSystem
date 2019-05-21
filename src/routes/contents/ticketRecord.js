@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-05-15T19:20:02 Z+08:00
-* @last_modified 2019-05-20T10:30:25 Z+08:00
+* @last_modified 2019-05-21T15:36:19 Z+08:00
 * 
 * @flow 
 */
@@ -14,21 +14,51 @@ import type { FrameProps } from '../../components/frame'
 import { Frame } from '../../components/frame';
 import moment from 'moment';
 import { Table } from 'antd';
+import { MyModal } from '../../components/modal';
+import type { Props as ModalData } from '../../components/modal';
 
-
-
-
+import { assign } from '../../utils/object';
 
 type Props = {}
 
+type State = {
+    modalData: {
+        state: {
+            loading: boolean,
+            visible: boolean,
+        }
+    }
+}
+
 type TiRcdTableProps = {}
 
-export class TicketRecord extends Component<Props> {
+export class TicketRecord extends Component<Props, State> {
 
     info: FrameProps
+    
+    modal: React$Element<any>
+
+    setState: Function
+
+    modalData: {
+        handleCancel: () => void,
+        handleOk: () => void,
+        contents: Array<React$Element<any>>
+    }
 
     constructor(props: Props) {
         super(props)
+
+        this.state = {
+            modalData: {
+                state: {
+                    loading: false,        
+                    visible: false,
+                },
+                
+            }
+        }
+
         this.info = {
             title: "购票记录",
             controls: {
@@ -39,7 +69,12 @@ export class TicketRecord extends Component<Props> {
                         {
                             name: "增加购票记录",
                             icon: "plus",
-                            // onClick: ()=>{},
+                            onClick: ()=>{
+                                this.setState(assign(this.state, "modalData.state", {
+                                    loading: false,        
+                                    visible: true,
+                                }))
+                            },
                         }
                     ]
                 },
@@ -48,11 +83,51 @@ export class TicketRecord extends Component<Props> {
             infoTotal:<div></div>,
             infoView: <TiRcdTable />
         }
+
+        this.modalData = {
+            handleCancel: () => {
+                this.setState({
+                    ...this.state,
+                    modalData: {
+                        ...this.state.modalData,
+                        state: {
+                            loading: false,
+                            visible: false,
+                        }
+                    }
+                })
+            },
+
+            handleOk: () => {
+
+            },
+            
+            contents: [
+                
+            ]
+        }
+
     }
 
     render() {
+
+        let modalData: ModalData = {
+            ...this.state.modalData,
+            ...this.modalData
+        }
+
+        let modal = <MyModal 
+            {...modalData}
+        />
+
+        let info = {
+            ...this.info,
+            infoTotal: modal
+        }
+
+
         return (
-            <Frame {...this.info}/>
+            <Frame {...info}/>
         )
     }
 }
