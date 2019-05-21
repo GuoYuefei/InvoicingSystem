@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-05-15T19:20:02 Z+08:00
-* @last_modified 2019-05-21T15:36:19 Z+08:00
+* @last_modified 2019-05-21T16:39:10 Z+08:00
 * 
 * @flow 
 */
@@ -17,7 +17,7 @@ import { Table } from 'antd';
 import { MyModal } from '../../components/modal';
 import type { Props as ModalData } from '../../components/modal';
 
-import { assign } from '../../utils/object';
+import obop from '../../utils/object';
 
 type Props = {}
 
@@ -70,10 +70,7 @@ export class TicketRecord extends Component<Props, State> {
                             name: "增加购票记录",
                             icon: "plus",
                             onClick: ()=>{
-                                this.setState(assign(this.state, "modalData.state", {
-                                    loading: false,        
-                                    visible: true,
-                                }))
+                                this.setState(obop.assign(this.state, "modalData.state.visible", true))
                             },
                         }
                     ]
@@ -86,20 +83,11 @@ export class TicketRecord extends Component<Props, State> {
 
         this.modalData = {
             handleCancel: () => {
-                this.setState({
-                    ...this.state,
-                    modalData: {
-                        ...this.state.modalData,
-                        state: {
-                            loading: false,
-                            visible: false,
-                        }
-                    }
-                })
+                this.setState(obop.assign(this.state, "modalData.state.visible", false))
             },
 
             handleOk: () => {
-
+                
             },
             
             contents: [

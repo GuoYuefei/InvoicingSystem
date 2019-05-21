@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-05-21T11:00:00 Z+08:00
-* @last_modified 2019-05-21T15:38:37 Z+08:00
+* @last_modified 2019-05-21T15:58:50 Z+08:00
 * 
 * @flow 
 */
@@ -27,10 +27,21 @@ function analyLoc(location: string): string[] {
         }
  * 
  * location = "modalData.state.loading"
- * modify true
+ * modify true 
  */
 
-function assign<T>(source: T, location: string, modify: any): T {
+
+/**
+ * @description 如上例，通过三个输入返回修改后的对象 定位字符串使用正常逻辑的.运算符分割
+ *
+ * @export
+ * @template T
+ * @param {T} source
+ * @param {string} location
+ * @param {*} modify
+ * @returns {T}
+ */
+export function assign<T>(source: T, location: string, modify: any): T {
 
     let result: T = {
         ...source
@@ -58,4 +69,14 @@ function assign<T>(source: T, location: string, modify: any): T {
 }
 
 
-export { assign }
+
+/**
+ *
+ * @export
+ * @class obop
+ */
+export default class obop {
+    static assign = assign;
+}
+
+// export { obop }
