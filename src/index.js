@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-04-29T11:40:56 Z+08:00
-* @last_modified 2019-05-20T10:31:08 Z+08:00
+* @last_modified 2019-05-28T16:54:32 Z+08:00
 * 
 * @flow 
 */
@@ -27,6 +27,7 @@ const app = dva({
 // 3. Model
 // app.model(require('./models/example').default);
 app.model(require("./models/contentIndex").contentIndex)
+app.model(require("./models/ticketRecordM").ticketRecordM)
 
 // 4. Router
 app.router(require('./router').default);

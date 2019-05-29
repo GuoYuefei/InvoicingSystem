@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-05-15T19:20:02 Z+08:00
-* @last_modified 2019-05-22T20:05:34 Z+08:00
+* @last_modified 2019-05-29T10:48:46 Z+08:00
 * 
 * @flow 
 */
@@ -21,7 +21,13 @@ import obop from '../../utils/object';
 import { MyForm } from '../../components/form';
 import type { Props as FormData } from '../../components/form'
 
-type Props = {}
+import { connect } from 'dva'
+
+type Props = {
+
+    dispatch: Function,
+
+}
 
 type State = {
     modalData: {
@@ -80,7 +86,7 @@ export class TicketRecord extends Component<Props, State> {
             },
             dataSource: [
                 {
-                    id: "invoice_code",
+                    id: "invoiceCode",
                     options: {
                         rules: [{ required: true, message: 'Please input Invoice code!' }],
                     },
@@ -157,7 +163,12 @@ export class TicketRecord extends Component<Props, State> {
                 // this.formRefs.current.submit();
                 this.formRefs.current.validateFields((err, values) => {
                     if (!err) {
-                        console.log('Received values of form: ', values);
+
+                        this.props.dispatch({
+                            type: "ticketRecordM/insertOne",
+                            data: values
+                        })
+
                         // console.log(values.date._d.toLocaleDateString())
                     }
                 });
@@ -255,3 +266,5 @@ class TiRcdTable extends Component<TiRcdTableProps, any> {
 }
 
 
+
+export default connect(state=>state.TicketRecordM)(TicketRecord)

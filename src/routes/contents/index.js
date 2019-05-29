@@ -3,7 +3,7 @@
 * @author Solomon
 * @license MIT
 * @created 2019-05-15T19:20:02 Z+08:00
-* @last_modified 2019-05-20T10:32:42 Z+08:00
+* @last_modified 2019-05-28T17:18:50 Z+08:00
 * 
 * @flow 
 */
@@ -13,7 +13,7 @@ import 'antd/dist/antd.css';
 import { Col, Row, Avatar } from "antd";
 import moment from 'moment';
 import { Today } from './today'
-import { TicketRecord } from './ticketRecord'
+import TicketRecord from './ticketRecord'
 import { connect } from "dva";
 
 
